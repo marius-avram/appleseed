@@ -46,6 +46,8 @@
 #include "Alembic/AbcCoreHDF5/ReadWrite.h"
 #include "Alembic/AbcGeom/IGeomParam.h"
 #include "Alembic/AbcGeom/IPolyMesh.h"
+#include "Alembic/AbcGeom/IXform.h"
+#include "Alembic/AbcGeom/XformSample.h"
 
 // OpenEXR headers.
 #include "OpenEXR/ImathVec.h"
@@ -91,10 +93,14 @@ namespace
             if (mesh_sample.getPositions()->size() < 3)
                 return;
 
+            // Find current transformation matrix in the hierachy
+            M44d transform_matrix;
+            compute_transform(mesh, transform_matrix);
+
             m_mesh_builder.begin_mesh(mesh.getName().c_str());
 
-            read_vertices(mesh_sample);
-            read_vertex_normals(mesh_schema);
+            read_vertices(mesh_sample, transform_matrix);
+            read_vertex_normals(mesh_schema, transform_matrix);
             read_uv(mesh_schema);
 
             // Use the mesh topology of the first sample.
@@ -111,19 +117,41 @@ namespace
         bool            m_has_vertex_normals;
         bool            m_has_uv;
 
-        void read_vertices(IPolyMeshSchema::Sample mesh_sample)
+        void compute_transform(IObject object, M44d& matrix)
+        {
+            if (IXform::matches(object.getHeader())) {
+                IXform xform(object, kWrapExisting);
+                XformSample xsample;
+                xform.getSchema().get(xsample);
+
+                // Get transformation matrix from current node and multiply it
+                // with the matrix which contains previous transforms
+                matrix *= xsample.getMatrix();
+
+                // Continue until parent has been reached
+                IObject parent = object.getParent();
+                if (parent)
+                    compute_transform(parent, matrix);
+            }
+        }
+
+        void read_vertices(IPolyMeshSchema::Sample mesh_sample, M44d& matrix)
         {
             const Imath::V3f* vertices = mesh_sample.getPositions()->get();
             const size_t vertex_count = mesh_sample.getPositions()->size();
 
             for (size_t i = 0; i < vertex_count; ++i)
             {
-                const Vector3d v(vertices[i]);      // todo: transform to world space using matrix stack
+                // transform to world space using matrix stack
+                Imath:V3f vertex = vertices[i];
+                vertex *= matrix;
+
+                const Vector3d v(vertex);
                 m_mesh_builder.push_vertex(v);
             }
         }
 
-        void read_vertex_normals(IPolyMeshSchema& mesh_schema)
+        void read_vertex_normals(IPolyMeshSchema& mesh_schema, M44d& matrix)
         {
             IN3fGeomParam normal_param = mesh_schema.getNormalsParam();
             if (!normal_param.valid())
@@ -135,10 +163,14 @@ namespace
 
             const N3f* normals = normal_sample.getVals()->get();
             const size_t normal_count = normal_sample.getVals()->size();
-                
+
             for (size_t i = 0; i < normal_count; ++i)
             {
-                const Vector3d n(normals[i]);       // todo: transform to world space using matrix stack
+                // transform to world space using matrix stack
+                Imath:V3f normal = normals[i];
+                normal *= matrix;
+
+                const Vector3d n(normal);
                 m_mesh_builder.push_vertex_normal(n);
             }
 
@@ -157,7 +189,7 @@ namespace
 
             const V2f* uv = uv_sample.getVals()->get();
             const size_t uv_count = uv_sample.getVals()->size();
-                
+
             for (size_t i = 0; i < uv_count; ++i)
             {
                 const Vector2d v(uv[i]);
