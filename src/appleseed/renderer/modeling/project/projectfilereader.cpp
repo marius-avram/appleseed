@@ -53,7 +53,6 @@
 #include "renderer/modeling/light/light.h"
 #include "renderer/modeling/light/lightfactoryregistrar.h"
 #include "renderer/modeling/material/imaterialfactory.h"
-#include "renderer/modeling/material/disneymaterial.h"
 #include "renderer/modeling/material/material.h"
 #include "renderer/modeling/material/materialfactoryregistrar.h"
 #include "renderer/modeling/object/meshobject.h"
@@ -1432,46 +1431,20 @@ namespace
     //
     // <material> element handler.
     //
-    typedef EntityElementHandler<
-                    Material,
-                    MaterialFactoryRegistrar,
-                    ParametrizedElementHandler> MaterialBaseHandler;
+
     class MaterialElementHandler
-      : public MaterialBaseHandler
+      : public EntityElementHandler<
+                   Material,
+                   MaterialFactoryRegistrar,
+                   ParametrizedElementHandler>
     {
       public:
         explicit MaterialElementHandler(ParseContext& context)
-          : MaterialBaseHandler("material", context)
+          : EntityElementHandler<
+                Material,
+                MaterialFactoryRegistrar,
+                ParametrizedElementHandler>("material", context)
         {
-        }
-
-        virtual void end_element() OVERRIDE
-        {
-            if (m_model == "generic_material")
-                MaterialBaseHandler::end_element();
-            else if (m_model == "disney_material")
-                end_disney_material();
-        }
-
-        void end_disney_material()
-        {
-            ParametrizedElementHandler::end_element();
-
-            try {
-                m_entity =
-                    DisneyMaterialFactory::create(
-                        m_name.c_str(),
-                        m_params
-                    );
-            }
-            catch (const ExceptionDictionaryItemNotFound& e)
-            {
-                RENDERER_LOG_ERROR(
-                    "while defining disney material \"%s\": required parameter \"%s\" missing.",
-                    m_name.c_str(),
-                    e.string());
-                m_context.get_event_counters().signal_error();
-            }
         }
     };
 
