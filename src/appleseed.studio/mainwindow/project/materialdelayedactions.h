@@ -47,6 +47,7 @@ namespace studio {
 // There delayed actions allow to schedule the creation and edition of materials
 // right before rendering starts. They are used to live-edit materials during
 // rendering.
+
 template <typename CollectionItem, typename Material>
 class MaterialCreationDelayedAction
   : public RenderingManager::IDelayedAction
@@ -71,6 +72,33 @@ class MaterialCreationDelayedAction
     CollectionItem*                         m_parent;
     const foundation::Dictionary            m_values;
 };
+
+/*
+template <typename Material>
+class EntityEditionDelayedAction
+  : public RenderingManager::IDelayedAction
+{
+  public:
+    EntityEditionDelayedAction(
+        EntityItem*                     parent,
+        const foundation::Dictionary&   values)
+      : m_parent(parent)
+      , m_values(values)
+    {
+    }
+
+    virtual void operator()(
+        renderer::MasterRenderer&       master_renderer,
+        renderer::Project&              project) OVERRIDE
+    {
+        (*m_parent).template edit<Material>(m_values);
+    }
+
+  private:
+    EntityItem*                         m_parent;
+    const foundation::Dictionary        m_values;
+};
+*/
 
 }       // namespace studio
 }       // namespace appleseed

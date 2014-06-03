@@ -32,6 +32,7 @@
 
 // appleseed.studio headers.
 #include "mainwindow/project/assemblyitem.h"
+#include "mainwindow/project/materialitem.h"
 #include "mainwindow/project/multimodelentityitem.h"
 #include "mainwindow/project/singlemodelentityitem.h"
 
@@ -68,26 +69,13 @@ ItemBase* MaterialCollectionItem::create_item(Material* material)
     assert(material);
 
     typedef MultiModelEntityItem<Material, Assembly, MaterialCollectionItem> GenericMaterialItem;
-    typedef SingleModelEntityItem<DisneyMaterial, Assembly, MaterialCollectionItem> DisneyMaterialItem;
+    typedef MultiModelEntityItem<DisneyMaterial, Assembly, MaterialCollectionItem> DisneyMaterialItem;
     const char* model = material->get_model();
-
-    ItemBase* item;
-    if (strcmp(model, "generic_material") == 0)
-    {
-        item = new GenericMaterialItem(
-            material,
-            m_parent,
-            this,
-            m_project_builder);
-    }
-    else if (strcmp(model, "disney_material") == 0)
-    {
-        item = new DisneyMaterialItem(
-            static_cast<DisneyMaterial*>(material),
-            m_parent,
-            this,
-            m_project_builder);
-    }
+    ItemBase* item = new MaterialItem(
+        material,
+        m_parent,
+        this,
+        m_project_builder);
 
     m_project_builder.get_item_registry().insert(material->get_uid(), item);
 
@@ -157,12 +145,12 @@ void MaterialCollectionItem::slot_create_disney()
             EntityTraits::get_entity_type_name(),
             EntityTraits::get_entity_container(m_parent));
 
-    typedef typename EntityTraits::FactoryType FactoryType;
+    typedef typename EntityTraits::FactoryRegistrarType FactoryRegistrarType;
 
     std::auto_ptr<EntityEditor::IFormFactory> form_factory(
-        new SingleModelEntityEditorFormFactory(
-            name_suggestion,
-            FactoryType::get_input_metadata()));
+        new MultiModelEntityEditorFormFactory<FactoryRegistrarType>(
+            m_project_builder.get_factory_registrar<Material>(),
+            name_suggestion));
 
     std::auto_ptr<EntityEditor::IEntityBrowser> entity_browser(
         new EntityBrowser<Assembly>(m_parent));

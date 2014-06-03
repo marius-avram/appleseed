@@ -206,7 +206,14 @@ ProjectBuilder::get_factory_registrar<renderer::Material>() const
 {
     return m_material_factory_registrar;
 }
-
+/*
+template <>
+inline const renderer::EntityTraits<renderer::Material>::FactoryRegistrarType&
+ProjectBuilder::get_factory_registrar<renderer::DisneyMaterial>() const
+{
+    return m_material_factory_registrar;
+}
+*/
 template <>
 inline const renderer::EntityTraits<renderer::RenderLayerRule>::FactoryRegistrarType&
 ProjectBuilder::get_factory_registrar<renderer::RenderLayerRule>() const
@@ -426,12 +433,14 @@ template <>
 inline foundation::auto_release_ptr<renderer::DisneyMaterial> ProjectBuilder::create_entity(
     const foundation::Dictionary&       values) const
 {
+/*
     const std::string name = get_entity_name(values);
 
     foundation::Dictionary clean_values(values);
     clean_values.strings().remove(EntityEditorFormFactoryBase::NameParameter);
 
     return renderer::DisneyMaterialFactory::create(name.c_str(), clean_values);
+*/
 }
 
 template <>

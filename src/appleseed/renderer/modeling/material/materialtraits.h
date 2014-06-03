@@ -89,11 +89,13 @@ struct EntityTraits<Material>
 //
 // Disney Material entity traits.
 //
+
 template <>
 struct EntityTraits<DisneyMaterial>
 {
     typedef MaterialContainer ContainerType;
-    typedef DisneyMaterialFactory FactoryType;
+    //typedef DisneyMaterialFactory FactoryType;
+    typedef MaterialFactoryRegistrar FactoryRegistrarType;
 
     static const char* get_entity_type_name()                           { return "disney material"; }
     static const char* get_human_readable_entity_type_name()            { return "Disney Material"; }

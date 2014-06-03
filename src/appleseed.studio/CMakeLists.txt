@@ -149,6 +149,8 @@ set (mainwindow_project_sources
     mainwindow/project/materialassignmenteditorwindow.cpp
     mainwindow/project/materialassignmenteditorwindow.h
     mainwindow/project/materialassignmenteditorwindow.ui
+    mainwindow/project/materialitem.cpp
+    mainwindow/project/materialitem.h
     mainwindow/project/materialcollectionitem.cpp
     mainwindow/project/materialcollectionitem.h
     mainwindow/project/materialdelayedactions.h
