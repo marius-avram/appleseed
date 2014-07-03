@@ -118,6 +118,8 @@ set (mainwindow_project_sources
     mainwindow/project/basegroupitem.h
     mainwindow/project/collectionitem.h
     mainwindow/project/collectionitembase.h
+    mainwindow/project/disneymaterialcustomui.cpp
+    mainwindow/project/disneymaterialcustomui.h
     mainwindow/project/entitybrowser.cpp
     mainwindow/project/entitybrowser.h
     mainwindow/project/entitybrowserwindow.cpp

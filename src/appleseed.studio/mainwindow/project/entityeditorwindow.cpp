@@ -34,6 +34,7 @@
 #include "ui_entityeditorwindow.h"
 
 // appleseed.studio headers.
+#include "mainwindow/project/disneymaterialcustomui.h"
 #include "utility/miscellaneous.h"
 
 // Qt headers.
@@ -63,6 +64,9 @@ EntityEditorWindow::EntityEditorWindow(
     setWindowTitle(QString::fromStdString(window_title));
     setWindowFlags(Qt::Tool);
     setAttribute(Qt::WA_DeleteOnClose);
+    
+    std::auto_ptr<EntityEditor::ICustomEntityUI> custom_entity(
+        new DisneyMaterialCustomUI());
 
     m_entity_editor.reset(
         new EntityEditor(
@@ -70,7 +74,7 @@ EntityEditorWindow::EntityEditorWindow(
             project,
             form_factory,
             entity_browser,
-            std::auto_ptr<EntityEditor::ICustomEntityUI>(),
+            custom_entity,
             values));
 
     m_initial_values = m_entity_editor->get_values();
