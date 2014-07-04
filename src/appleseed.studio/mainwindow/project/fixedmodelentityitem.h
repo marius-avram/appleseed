@@ -59,10 +59,11 @@ class FixedModelEntityItem
 {
   public:
     FixedModelEntityItem(
-        Entity*             entity,
-        ParentEntity&       parent,
-        CollectionItem*     collection_item,
-        ProjectBuilder&     project_builder);
+        Entity*                                         entity,
+        ParentEntity&                                   parent,
+        CollectionItem*                                 collection_item,
+        ProjectBuilder&                                 project_builder,
+        std::auto_ptr<EntityEditor::ICustomEntityUI>    custom_entity_ui);
 
   private:
     typedef EntityItem<Entity, ParentEntity, CollectionItem> Base;
@@ -82,10 +83,12 @@ class FixedModelEntityItem
 
 template <typename Entity, typename ParentEntity, typename CollectionItem>
 FixedModelEntityItem<Entity, ParentEntity, CollectionItem>::FixedModelEntityItem(
-    Entity*                 entity,
-    ParentEntity&           parent,
-    CollectionItem*         collection_item,
-    ProjectBuilder&         project_builder)
+    Entity*                                         entity,
+    ParentEntity&                                   parent,
+    CollectionItem*                                 collection_item,
+    ProjectBuilder&                                 project_builder,
+    std::auto_ptr<EntityEditor::ICustomEntityUI>    custom_entity_ui)
+
   : Base(entity, parent, collection_item, project_builder)
 {
 }
