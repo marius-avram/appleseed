@@ -1369,6 +1369,8 @@ source_group ("renderer\\modeling\\frame" FILES
 set (renderer_modeling_input_sources
     renderer/modeling/input/colorsource.cpp
     renderer/modeling/input/colorsource.h
+    renderer/modeling/input/expression.cpp
+    renderer/modeling/input/expression.h
     renderer/modeling/input/inputarray.cpp
     renderer/modeling/input/inputarray.h
     renderer/modeling/input/inputbinder.cpp
@@ -1416,6 +1418,8 @@ source_group ("renderer\\modeling\\light" FILES
 set (renderer_modeling_material_sources
     renderer/modeling/material/bumpmappingmodifier.cpp
     renderer/modeling/material/bumpmappingmodifier.h
+    renderer/modeling/material/disneymaterial.cpp
+    renderer/modeling/material/disneymaterial.h
     renderer/modeling/material/genericmaterial.cpp
     renderer/modeling/material/genericmaterial.h
     renderer/modeling/material/imaterialfactory.cpp
@@ -1685,9 +1689,10 @@ if (WITH_OSL)
     link_against_oslexec (appleseed)
 endif ()
 
+link_against_seexpr(appleseed)
+
 target_link_libraries (appleseed ${Boost_LIBRARIES})
 target_link_libraries (appleseed lz4 minilzo)
-
 
 #--------------------------------------------------------------------------------------------------
 # Post-build commands.
