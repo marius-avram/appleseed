@@ -32,8 +32,8 @@
 #include "renderer/modeling/bsdf/ashikhminbrdf.h"
 #include "renderer/modeling/bsdf/diffusebtdf.h"
 #include "renderer/modeling/bsdf/lambertianbrdf.h"
+#include "renderer/modeling/bsdf/microfacet2brdf.h"
 #include "renderer/modeling/bsdf/orennayarbrdf.h"
-#include "renderer/modeling/bsdf/oslmicrofacetbrdf.h"
 #include "renderer/modeling/bsdf/specularbrdf.h"
 #include "renderer/modeling/bsdf/specularbtdf.h"
 
@@ -123,7 +123,7 @@ class APPLESEED_ALIGN(16) CompositeClosure
         AshikminBRDFInputValues,
         DiffuseBTDFInputValues,
         LambertianBRDFInputValues,
-        OSLMicrofacetBRDFInputValues,
+        Microfacet2BRDFInputValues,
         OrenNayarBRDFInputValues,
         SpecularBRDFInputValues,
         SpecularBTDFInputValues> InputValuesTypeList;
@@ -174,7 +174,7 @@ class APPLESEED_ALIGN(16) CompositeClosure
         const ClosureID             closure_type,
         const foundation::Color3f&  weight,
         const foundation::Vector3d& normal,
-        const bool                  has_tangent,
+        bool                        has_tangent,
         const foundation::Vector3d& tangent,
         const InputValues&          values);
 };

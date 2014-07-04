@@ -32,7 +32,7 @@
 
 // appleseed.renderer headers.
 #include "renderer/global/globaltypes.h"
-#include "renderer/modeling/entity/entity.h"
+#include "renderer/modeling/entity/connectableentity.h"
 #include "renderer/utility/transformsequence.h"
 
 // appleseed.foundation headers.
@@ -59,7 +59,7 @@ namespace renderer
 //
 
 class DLLSYMBOL Camera
-  : public Entity
+  : public ConnectableEntity
 {
   public:
     // Return the unique ID of this class of entities.
@@ -96,7 +96,7 @@ class DLLSYMBOL Camera
     virtual void on_frame_end(const Project& project);
 
     // Generate a ray directed toward a given point on the film plane, expressed
-    // in normalized device coordinates (http://appleseedhq.net/conventions).
+    // in normalized device coordinates (https://github.com/appleseedhq/appleseed/wiki/Terminology).
     // The generated ray is expressed in world space.
     virtual void generate_ray(
         SamplingContext&                sampling_context,

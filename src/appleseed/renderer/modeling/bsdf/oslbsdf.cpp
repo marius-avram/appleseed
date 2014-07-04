@@ -38,7 +38,7 @@
 #include "renderer/modeling/bsdf/bsdffactoryregistrar.h"
 #include "renderer/modeling/bsdf/bsdfwrapper.h"
 #include "renderer/modeling/bsdf/ibsdffactory.h"
-#include "renderer/modeling/bsdf/oslmicrofacetbrdf.h"
+#include "renderer/modeling/bsdf/microfacet2brdf.h"
 #include "renderer/modeling/input/inputevaluator.h"
 #include "renderer/modeling/scene/assembly.h"
 #include "renderer/utility/paramarray.h"
@@ -101,6 +101,12 @@ namespace
                     "lambertian_brdf",
                     "osl_lambert");
 
+            m_orennayar_brdf =
+                create_and_register_bsdf(
+                    OrenNayarID,
+                    "orennayar_brdf",
+                    "osl_orennayar");
+
             m_specular_brdf =
                 create_and_register_bsdf(
                     ReflectionID,
@@ -113,12 +119,6 @@ namespace
                     "specular_btdf",
                     "osl_refraction");
             
-            m_orennayar_brdf =
-                create_and_register_bsdf(
-                    OrenNayarID,
-                    "orennayar_brdf",
-                    "osl_orennayar");
-
             // OSL Microfacet models.
             m_microfacet_beckmann_brdf = 
                 create_and_register_microfacet_brdf(
@@ -350,7 +350,7 @@ namespace
             const char*             name)
         {
             auto_release_ptr<BSDF> bsdf =
-                OSLMicrofacetBRDFFactory().create(
+                Microfacet2BRDFFactory().create(
                     name, 
                     ParamArray().insert("mdf", mdf_name));
 

@@ -240,6 +240,8 @@ set (foundation_math_sources
     foundation/math/area.h
     foundation/math/basis.h
     foundation/math/bestcandidate.h
+    foundation/math/bezier.h
+    foundation/math/beziercurve.h
     foundation/math/bsp.h
     foundation/math/bvh.h
     foundation/math/cdf.h
@@ -365,6 +367,7 @@ set (foundation_meta_tests_sources
     foundation/meta/tests/test_attributeset.cpp
     foundation/meta/tests/test_autoreleaseptr.cpp
     foundation/meta/tests/test_benchmarkaggregator.cpp
+    foundation/meta/tests/test_beziercurve.cpp
     foundation/meta/tests/test_bitmask.cpp
     foundation/meta/tests/test_boost_datetime.cpp
     foundation/meta/tests/test_boost_path.cpp
@@ -1194,9 +1197,11 @@ set (renderer_modeling_bsdf_sources
     renderer/modeling/bsdf/lambertianbrdf.h
     renderer/modeling/bsdf/microfacetbrdf.cpp
     renderer/modeling/bsdf/microfacetbrdf.h
+    renderer/modeling/bsdf/microfacet2brdf.cpp
+    renderer/modeling/bsdf/microfacet2brdf.h
     renderer/modeling/bsdf/oslmicrofacetbrdf.cpp
-    renderer/modeling/bsdf/oslmicrofacetbrdf.h
-    renderer/modeling/bsdf/nullbsdf.h
+    renderer/modeling/bsdf/oslmicrofacetbrdf.h    
+	renderer/modeling/bsdf/nullbsdf.h
     renderer/modeling/bsdf/orennayarbrdf.cpp
     renderer/modeling/bsdf/orennayarbrdf.h       
     renderer/modeling/bsdf/specularbrdf.cpp
@@ -1364,8 +1369,6 @@ source_group ("renderer\\modeling\\frame" FILES
 set (renderer_modeling_input_sources
     renderer/modeling/input/colorsource.cpp
     renderer/modeling/input/colorsource.h
-    renderer/modeling/input/expression.cpp
-    renderer/modeling/input/expression.h
     renderer/modeling/input/inputarray.cpp
     renderer/modeling/input/inputarray.h
     renderer/modeling/input/inputbinder.cpp
@@ -1413,8 +1416,6 @@ source_group ("renderer\\modeling\\light" FILES
 set (renderer_modeling_material_sources
     renderer/modeling/material/bumpmappingmodifier.cpp
     renderer/modeling/material/bumpmappingmodifier.h
-    renderer/modeling/material/disneymaterial.cpp
-    renderer/modeling/material/disneymaterial.h
     renderer/modeling/material/genericmaterial.cpp
     renderer/modeling/material/genericmaterial.h
     renderer/modeling/material/imaterialfactory.cpp
@@ -1683,8 +1684,6 @@ if (WITH_OSL)
     link_against_oiio (appleseed)
     link_against_oslexec (appleseed)
 endif ()
-
-link_against_seexpr(appleseed)
 
 target_link_libraries (appleseed ${Boost_LIBRARIES})
 target_link_libraries (appleseed lz4 minilzo)

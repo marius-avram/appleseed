@@ -7,6 +7,7 @@
 //
 // Copyright (c) 2010-2013 Francois Beaune, Jupiter Jazz Limited
 // Copyright (c) 2014 Francois Beaune, The appleseedhq Organization
+// Copyright (c) 2014 Esteban Tovagliari, The appleseedhq Organization
 //
 // Permission is hereby granted, free of charge, to any person obtaining a copy
 // of this software and associated documentation files (the "Software"), to deal
@@ -37,6 +38,10 @@
 #include "foundation/utility/maplefile.h"
 #include "foundation/utility/test.h"
 
+// boost headers.
+#include <boost/mpl/assert.hpp>
+#include <boost/mpl/not.hpp>
+
 // Standard headers.
 #include <cmath>
 #include <cstddef>
@@ -54,12 +59,11 @@ TEST_SUITE(Foundation_Math_Microfacet2)
         const typename MDF::ValueType   alpha_y,
         const size_t                    sample_count)
     {
-        Vector<typename MDF::ValueType,3> h(0.0);
-        
         for (size_t i = 0; i < sample_count; ++i)
         {
-            const double theta = radical_inverse_base2<double>(i) * HalfPi;
-            h.y = cos(theta);
+            static const size_t Bases[] = { 2 };
+            const Vector2d s = hammersley_sequence<double, 2>(Bases, i, sample_count);
+            Vector<typename MDF::ValueType,3> h = sample_hemisphere_uniform(s);
             const double value = mdf.D(h, alpha_x, alpha_y);
 
             if (value < 0.0)
@@ -69,7 +73,6 @@ TEST_SUITE(Foundation_Math_Microfacet2)
         return true;
     }
 
-    
     template <typename MDF>
     typename MDF::ValueType integrate_quadrature(
         const MDF&                      mdf,
@@ -77,6 +80,8 @@ TEST_SUITE(Foundation_Math_Microfacet2)
         const typename MDF::ValueType   alpha_y,
         const size_t                    sample_count)
     {
+        BOOST_MPL_ASSERT((boost::mpl::not_<typename MDF::IsAnisotropicType>));
+
         typedef typename MDF::ValueType RealType;
         
         Vector<RealType,3> h(0.0);

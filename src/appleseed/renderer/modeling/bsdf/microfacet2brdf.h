@@ -5,8 +5,7 @@
 //
 // This software is released under the MIT license.
 //
-// Copyright (c) 2010-2013 Francois Beaune, Jupiter Jazz Limited
-// Copyright (c) 2014 Francois Beaune, The appleseedhq Organization
+// Copyright (c) 2014 Esteban Tovagliari, The appleseedhq Organization
 //
 // Permission is hereby granted, free of charge, to any person obtaining a copy
 // of this software and associated documentation files (the "Software"), to deal
@@ -27,57 +26,63 @@
 // THE SOFTWARE.
 //
 
-#ifndef APPLESEED_RENDERER_KERNEL_RENDERING_ISAMPLERENDERER_H
-#define APPLESEED_RENDERER_KERNEL_RENDERING_ISAMPLERENDERER_H
+#ifndef APPLESEED_RENDERER_MODELING_BSDF_MICROFACET2BRDF_H
+#define APPLESEED_RENDERER_MODELING_BSDF_MICROFACET2BRDF_H
 
 // appleseed.renderer headers.
-#include "renderer/global/globaltypes.h"
+#include "renderer/modeling/bsdf/ibsdffactory.h"
+#include "renderer/modeling/input/inputarray.h"
 
 // appleseed.foundation headers.
-#include "foundation/core/concepts/iunknown.h"
-#include "foundation/math/vector.h"
+#include "foundation/platform/compiler.h"
+#include "foundation/utility/autoreleaseptr.h"
+
+// appleseed.main headers.
+#include "main/dllsymbol.h"
 
 // Forward declarations.
-namespace foundation    { class StatisticsVector; }
-namespace renderer      { class PixelContext; }
-namespace renderer      { class ShadingResult; }
+namespace foundation    { class DictionaryArray; }
+namespace renderer      { class BSDF; }
+namespace renderer      { class ParamArray; }
 
 namespace renderer
 {
 
 //
-// Sample renderer interface.
+// Microfacet2 BRDF input values.
 //
 
-class ISampleRenderer
-  : public foundation::IUnknown
+DECLARE_INPUT_VALUES(Microfacet2BRDFInputValues)
 {
-  public:
-    // Render a sample at a given point on the image plane expressed in
-    // normalized device coordinates (https://github.com/appleseedhq/appleseed/wiki/Terminology).
-    virtual void render_sample(
-        SamplingContext&                sampling_context,
-        const PixelContext&             pixel_context,
-        const foundation::Vector2d&     image_point,
-        ShadingResult&                  shading_result) = 0;
-
-    // Retrieve performance statistics.
-    virtual foundation::StatisticsVector get_statistics() const = 0;
+    double m_ax;
+    double m_ay;
+    double m_eta;
 };
 
 
 //
-// Interface of a ISampleRenderer factory.
+// Microfacet2 BRDF factory.
 //
 
-class ISampleRendererFactory
-  : public foundation::IUnknown
+class DLLSYMBOL Microfacet2BRDFFactory
+  : public IBSDFFactory
 {
   public:
-    // Return a new sample renderer instance.
-    virtual ISampleRenderer* create(const bool primary) = 0;
+    // Return a string identifying this BSDF model.
+    virtual const char* get_model() const OVERRIDE;
+
+    // Return a human-readable string identifying this BSDF model.
+    virtual const char* get_human_readable_model() const OVERRIDE;
+
+    // Return a set of input metadata for this BSDF model.
+    virtual foundation::DictionaryArray get_input_metadata() const OVERRIDE;
+
+    // Create a new BSDF instance.
+    virtual foundation::auto_release_ptr<BSDF> create(
+        const char*         name,
+        const ParamArray&   params) const OVERRIDE;
 };
 
 }       // namespace renderer
 
-#endif  // !APPLESEED_RENDERER_KERNEL_RENDERING_ISAMPLERENDERER_H
+#endif  // !APPLESEED_RENDERER_MODELING_BSDF_MICROFACET2BRDF_H
