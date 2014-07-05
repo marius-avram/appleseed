@@ -132,12 +132,17 @@ set (mainwindow_project_sources
     mainwindow/project/entityeditor.h
     mainwindow/project/entityeditorformfactorybase.cpp
     mainwindow/project/entityeditorformfactorybase.h
+    mainwindow/project/entityeditorutils.cpp
+    mainwindow/project/entityeditorutils.h
     mainwindow/project/entityeditorwindow.cpp
     mainwindow/project/entityeditorwindow.h
     mainwindow/project/entityeditorwindow.ui
     mainwindow/project/entityitem.h
     mainwindow/project/entityitembase.h
     mainwindow/project/exceptioninvalidentityname.h
+    mainwindow/project/expressioneditorwindow.cpp
+    mainwindow/project/expressioneditorwindow.h
+    mainwindow/project/expressioneditorwindow.ui
     mainwindow/project/fixedmodelentityeditorformfactory.h
     mainwindow/project/fixedmodelentityitem.h
     mainwindow/project/frameitem.cpp

@@ -136,7 +136,7 @@ void MaterialCollectionItem::do_create_material(const char* model)
     if (strcmp(model, "disney_material") == 0)
     {
         custom_entity_ui = std::auto_ptr<EntityEditor::ICustomEntityUI>(
-            new DisneyMaterialCustomUI());
+            new DisneyMaterialCustomUI(Base::m_project_builder.get_project()));
     }
 
     open_entity_editor(
