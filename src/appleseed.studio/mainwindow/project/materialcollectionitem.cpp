@@ -34,6 +34,7 @@
 #include "mainwindow/project/assemblyitem.h"
 #include "mainwindow/project/disneymaterialcustomui.h"
 #include "mainwindow/project/entityeditor.h"
+#include "mainwindow/project/entityeditorwindow.h"
 #include "mainwindow/project/fixedmodelentityitem.h"
 
 // Standard headers.
@@ -84,6 +85,12 @@ ItemBase* MaterialCollectionItem::create_item(Material* material)
 
     typedef FixedModelEntityItem<renderer::Material, renderer::Assembly, MaterialCollectionItem> MaterialItem;
     std::auto_ptr<EntityEditor::ICustomEntityUI> custom_entity_ui;
+    
+    if (strcmp(material->get_model(), "disney_material") == 0)
+    {
+        custom_entity_ui = std::auto_ptr<EntityEditor::ICustomEntityUI>(
+            new DisneyMaterialCustomUI(Base::m_project_builder.get_project()));
+    }
 
     ItemBase* item = new MaterialItem(material, m_parent, this, m_project_builder, custom_entity_ui);
     m_project_builder.get_item_registry().insert(material->get_uid(), item);
@@ -132,14 +139,14 @@ void MaterialCollectionItem::do_create_material(const char* model)
         new EntityBrowser<Assembly>(Base::m_parent));
 
     std::auto_ptr<EntityEditor::ICustomEntityUI> custom_entity_ui;
-    
+
     if (strcmp(model, "disney_material") == 0)
     {
         custom_entity_ui = std::auto_ptr<EntityEditor::ICustomEntityUI>(
             new DisneyMaterialCustomUI(Base::m_project_builder.get_project()));
     }
 
-    open_entity_editor(
+    EntityEditorWindow* editor_window = open_entity_editor(
         QTreeWidgetItem::treeWidget(),
         window_title,
         Base::m_project_builder.get_project(),
@@ -151,6 +158,11 @@ void MaterialCollectionItem::do_create_material(const char* model)
         SLOT(slot_create_applied(foundation::Dictionary)),
         SLOT(slot_create_accepted(foundation::Dictionary)),
         SLOT(slot_create_canceled(foundation::Dictionary)));
+
+    if (strcmp(model, "disney_material") == 0)
+    {
+        editor_window->resize(500, 630);
+    }
 }
 
 }   // namespace studio

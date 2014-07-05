@@ -188,6 +188,7 @@ if (WITH_OSL)
 endif ()
 
 find_package(SeExpr REQUIRED)
+find_package(SeExprEditor REQUIRED)
 
 #--------------------------------------------------------------------------------------------------
 # Include paths.
@@ -253,6 +254,7 @@ if (WITH_OSL)
 endif ()
 
 include_directories (${SEEXPR_INCLUDE_DIRS})
+include_directories (${SEEXPREDITOR_INCLUDE_DIRS})
 
 #--------------------------------------------------------------------------------------------------
 # Extract version from git.

@@ -120,6 +120,8 @@ set (mainwindow_project_sources
     mainwindow/project/collectionitembase.h
     mainwindow/project/disneymaterialcustomui.cpp
     mainwindow/project/disneymaterialcustomui.h
+    mainwindow/project/disneymateriallayerui.cpp
+    mainwindow/project/disneymateriallayerui.h
     mainwindow/project/entitybrowser.cpp
     mainwindow/project/entitybrowser.h
     mainwindow/project/entitybrowserwindow.cpp
@@ -423,6 +425,7 @@ apply_preprocessor_definitions (appleseed.studio)
 # Static libraries must be specified in order of reverse-dependency.
 link_against_platform (appleseed.studio)
 link_against_openexr (appleseed.studio)
+link_against_seexpreditor(appleseed.studio)
 
 target_link_libraries (appleseed.studio
     appleseed

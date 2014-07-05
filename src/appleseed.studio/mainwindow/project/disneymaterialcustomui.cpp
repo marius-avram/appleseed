@@ -30,6 +30,7 @@
 #include "disneymaterialcustomui.h"
 
 // appleseed.studio headers.
+#include "mainwindow/project/disneymateriallayerui.h"
 #include "mainwindow/project/entityeditorutils.h"
 #include "mainwindow/project/expressioneditorwindow.h"
 #include "utility/doubleslider.h"
@@ -75,242 +76,16 @@ using namespace std;
 namespace appleseed {
 namespace studio {
 
-class DisneyMaterialCustomUI::LayerWidget
-  : public QFrame
-{
-    Q_OBJECT
-
-  public:
-    LayerWidget(
-        const string&           layer_name,
-        DisneyMaterialCustomUI* entity_editor,
-        QVBoxLayout*            form_layout,
-        QWidget*                parent = 0)
-      : m_layer_name(layer_name)
-      , m_entity_editor(entity_editor)
-      , QFrame(parent)
-      , m_form_layout(form_layout)
-      , m_is_folded(false)
-    {
-        setObjectName("layer");
-
-        m_spacer = new QWidget();
-        QHBoxLayout* spacer_layout = new QHBoxLayout(m_spacer);
-        spacer_layout->setSpacing(0);
-
-        m_layout = new QVBoxLayout(this);
-        m_form_layout->insertWidget(m_form_layout->count() - 2, this);
-
-        QWidget *button_box = new QWidget(this);
-        QHBoxLayout *button_box_layout = new QHBoxLayout(button_box);
-        button_box_layout->setSpacing(0);
-        button_box_layout->setMargin(0);
-        m_layout->addWidget(button_box);
-
-        // Folding button.
-        m_fold_arrow_disabled = QIcon(":/widgets/header_arrow_down_disabled.png");
-        m_fold_arrow_enabled = QIcon(":/widgets/scrollbar_arrow_right_disabled.png");
-        m_fold_button = new QToolButton(button_box);
-        m_fold_button->setIcon(m_fold_arrow_disabled);
-        button_box_layout->addWidget(m_fold_button);
-        connect(m_fold_button, SIGNAL(clicked()), this, SLOT(slot_fold()));
-
-        button_box_layout->addStretch(1);
-
-        // Up button.
-        QIcon arrow_up = QIcon(":icons/layer_arrow_up.png");
-        QToolButton* up_button = new QToolButton(button_box);
-        up_button->setIcon(arrow_up);
-        button_box_layout->addWidget(up_button);
-        connect(up_button, SIGNAL(clicked()), this, SLOT(slot_move_layer_up()));
-
-        // Down button.
-        QIcon arrow_down = QIcon(":icons/layer_arrow_down.png");
-        QToolButton* down_button = new QToolButton(button_box);
-        down_button->setIcon(arrow_down);
-        button_box_layout->addWidget(down_button);
-        connect(down_button, SIGNAL(clicked()), this, SLOT(slot_move_layer_down()));
-
-        // Close button.
-        QIcon close = QIcon(":/icons/close.png");
-        QToolButton* close_button = new QToolButton(button_box);
-        close_button->setIcon(close);
-        button_box_layout->addWidget(close_button);
-        connect(close_button, SIGNAL(clicked()), this, SLOT(slot_delete_layer()));
-    }
-
-    void mousePressEvent(QMouseEvent* event)
-    {
-        for (int i=1; i<m_form_layout->count()-2; ++i)
-        {
-            QLayoutItem* layout_item = m_form_layout->itemAt(i);
-            QWidget* widget = layout_item->widget();
-            if (widget->objectName() == "selected_layer")
-            {
-                widget->setObjectName("layer");
-                style()->unpolish(widget);
-                style()->polish(widget);
-                break;
-            }
-        }
-        setObjectName("selected_layer");
-        style()->unpolish(this);
-        style()->polish(this);
-    }
-
-    void mouseDoubleClickEvent(QMouseEvent* event)
-    {
-        fold_layer();
-    }
-
-    QVBoxLayout* get_layout()
-    {
-        return m_layout;
-    }
-  
-  private:
-    void fold_layer()
-    {
-        if (m_is_folded)
-        {
-            m_layout->removeWidget(m_spacer);
-            m_spacer->hide();
-            m_fold_button->setIcon(m_fold_arrow_disabled);
-        }
-
-        for (int i=2; i<m_layout->count(); ++i)
-        {
-            QLayout* vertical_layout = m_layout->itemAt(i)->layout();
-            for (int j=0; j<vertical_layout->count(); ++j)
-            {
-                QWidget* widget = vertical_layout->itemAt(j)->widget();
-                m_is_folded ? widget->show() : widget->hide();
-            }
-        }
-        
-        if (!m_is_folded)
-        {
-            m_layout->addWidget(m_spacer);
-            m_spacer->show();
-            m_fold_button->setIcon(m_fold_arrow_enabled);
-        }
-
-        m_is_folded = !m_is_folded;
-    }
-
-  private slots:
-    void slot_delete_layer() 
-    {
-        // Remove model
-        string layer_rename = m_entity_editor->m_renames.get(m_layer_name.c_str());
-        m_entity_editor->m_params.dictionaries().remove(layer_rename);
-        delete this;
-    }
-
-    void slot_move_layer_up()
-    {
-        int new_position = 0;
-        // Update interface.
-        for (int i=1; i<m_form_layout->count(); ++i)
-        {
-            QLayoutItem* layout_item = m_form_layout->itemAt(i);
-            if (this == layout_item->widget())
-            {
-                if (i > 1)
-                {
-                    m_form_layout->takeAt(i);
-                    new_position = i-1;
-                    m_form_layout->insertWidget(new_position, this);
-                }
-                break;
-            }
-        }
-
-        // Update model.
-        if (new_position > 0)
-        {
-            string previous_layer_name, current_layer_name;
-            for (const_each<DictionaryDictionary> i = m_entity_editor->m_params.dictionaries(); i; ++i)
-            {
-                Dictionary& layer_params = m_entity_editor->m_params.dictionary(i->name());
-                size_t layer_number = layer_params.get<size_t>("layer_number");
-                if (layer_number == new_position)
-                    previous_layer_name = i->name();
-                else if (layer_number == new_position+1)
-                    current_layer_name = i->name();
-            }
-            m_entity_editor->m_params
-                .dictionary(previous_layer_name)
-                .insert("layer_number", new_position+1);
-            m_entity_editor->m_params
-                .dictionary(current_layer_name)
-                .insert("layer_number", new_position);
-        }
-    }
-
-    void slot_move_layer_down()
-    {
-        int new_position = 0;
-        // Update interface.
-        for (int i=1; i<m_form_layout->count(); ++i)
-        {
-            QLayoutItem* layout_item = m_form_layout->itemAt(i);
-            if (this == layout_item->widget())
-            {
-                if (i < m_form_layout->count()-3)
-                {
-                    m_form_layout->takeAt(i);
-                    new_position = i+1;
-                    m_form_layout->insertWidget(new_position, this);
-                }
-                break;
-            }
-        }
-
-        // Update model.
-        if (new_position > 0)
-        {
-            string next_layer_name, current_layer_name;
-            for (const_each<DictionaryDictionary> i = m_entity_editor->m_params.dictionaries(); i; ++i)
-            {
-                Dictionary& layer_params = m_entity_editor->m_params.dictionary(i->name());
-                size_t layer_number = layer_params.get<size_t>("layer_number");
-                if (layer_number == new_position-1)
-                    current_layer_name = i->name();
-                else if (layer_number == new_position)
-                    next_layer_name = i->name();
-            }
-            m_entity_editor->m_params
-                .dictionary(current_layer_name)
-                .insert("layer_number", new_position);
-            m_entity_editor->m_params
-                .dictionary(next_layer_name)
-                .insert("layer_number", new_position-1);
-        }
-    }
-
-    void slot_fold()
-    {
-        fold_layer();
-    }
-
-  private:
-    string                      m_layer_name;
-    DisneyMaterialCustomUI*     m_entity_editor;
-
-    QVBoxLayout*                m_layout;
-    QVBoxLayout*                m_form_layout;
-    QWidget*                    m_spacer;
-    QToolButton*                m_fold_button;
-    bool                        m_is_folded;
-    QIcon                       m_fold_arrow_enabled;
-    QIcon                       m_fold_arrow_disabled;
-};
-
 DisneyMaterialCustomUI::DisneyMaterialCustomUI(const renderer::Project& project)
   : QWidget()
   , m_project(project)
   , m_parent(0)
+  , m_num_created_layers(0)
+  , m_selected_layer_widget(0)
+  , m_color_picker_signal_mapper(new QSignalMapper(this))
+  , m_file_picker_signal_mapper(new QSignalMapper(this))
+  , m_expression_editor_signal_mapper(new QSignalMapper(this))
+  , m_line_edit_signal_mapper(new QSignalMapper(this))
 {
 
 }
@@ -324,18 +99,28 @@ void DisneyMaterialCustomUI::create_custom_widgets(
     QVBoxLayout*        layout,
     const Dictionary&   values)
 {
-    // Create some example widgets, for testing.
-    QPushButton *x = new QPushButton();
-    x->setText("XXX");
-    layout->addWidget(x);
+    m_parent = layout->parentWidget();
+    m_form_layout = layout;
+    m_form_layout->setSpacing(5);
 
-    x = new QPushButton();
-    x->setText("YYY");
-    layout->addWidget(x);
+    // Global material parameters.
+    add_material_parameters();
 
-    x = new QPushButton();
-    x->setText("ZZZ");
-    layout->addWidget(x);
+    // New layer button.
+    QIcon add_icon = QIcon(":/widgets/big_add.png");
+    QPushButton *add_layer_button = new QPushButton(add_icon, "   Add new layer");
+    add_layer_button->setObjectName("add_layer");
+    m_form_layout->addWidget(add_layer_button);
+    connect(add_layer_button, SIGNAL(clicked()), this, SLOT(slot_add_layer()));
+
+    // Stretch at the end.
+    m_form_layout->addStretch(1);
+
+    // Default layer.
+    add_layer();
+    
+    // Recreate connections.
+    create_connections();
 }
 
 Dictionary DisneyMaterialCustomUI::get_values() const
@@ -513,28 +298,6 @@ void DisneyMaterialCustomUI::create_buttons_connections(const QString& widget_na
     m_widget_proxies.insert(widget_name.toStdString(), widget_proxy);
 }
 
-void DisneyMaterialCustomUI::create_form_layout()
-{
-    m_form_layout = new QVBoxLayout(m_parent);
-    m_form_layout->setSpacing(5);
-
-    // Global material parameters.
-    add_material_parameters();
-
-    // New layer button.
-    QIcon add_icon = QIcon(":/widgets/big_add.png");
-    QPushButton *add_layer_button = new QPushButton(add_icon, "   Add new layer");
-    add_layer_button->setObjectName("add_layer");
-    m_form_layout->addWidget(add_layer_button);
-    connect(add_layer_button, SIGNAL(clicked()), this, SLOT(slot_add_layer()));
-
-    // Stretch at the end.
-    m_form_layout->addStretch(1);
-
-    // Default layer.
-    add_layer();
-}
-
 void DisneyMaterialCustomUI::create_parameters_layout()
 {
     m_group_widget = new QWidget();
@@ -546,7 +309,7 @@ void DisneyMaterialCustomUI::create_parameters_layout()
 
 void DisneyMaterialCustomUI::create_layer_layout(const std::string& layer_name)
 {
-    LayerWidget* layer_widget = new LayerWidget(layer_name, this, m_form_layout);
+    DisneyMaterialLayerUI* layer_widget = new DisneyMaterialLayerUI(layer_name, this, m_form_layout);
     m_group_layout = layer_widget->get_layout();
     m_group_widget = layer_widget;
 
@@ -692,13 +455,6 @@ void DisneyMaterialCustomUI::add_material_parameters()
 
     metadata.push_back(
         Dictionary()
-            .insert("name", "name")
-            .insert("label", "Name")
-            .insert("type", "text")
-            .insert("default", "disney_material1"));
-
-    metadata.push_back(
-        Dictionary()
             .insert("name", "alpha_mask")
             .insert("label", "Alpha Mask")
             .insert("type", "colormap")
@@ -718,8 +474,6 @@ void DisneyMaterialCustomUI::add_material_parameters()
 
         if (type == "colormap")
             create_colormap_input_widgets(*i, "base");
-        else if (type == "text")
-            create_text_input_widgets(*i, "base");
     }
 }
 

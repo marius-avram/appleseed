@@ -74,6 +74,8 @@ class FixedModelEntityItem
     > FixedModelEntityEditorFormFactoryType;
 
     virtual void slot_edit(AttributeEditor* attribute_editor) OVERRIDE;
+
+    std::auto_ptr<EntityEditor::ICustomEntityUI> m_custom_entity_ui;
 };
 
 
@@ -90,6 +92,7 @@ FixedModelEntityItem<Entity, ParentEntity, CollectionItem>::FixedModelEntityItem
     std::auto_ptr<EntityEditor::ICustomEntityUI>    custom_entity_ui)
 
   : Base(entity, parent, collection_item, project_builder)
+  , m_custom_entity_ui(custom_entity_ui)
 {
 }
 
@@ -132,6 +135,7 @@ void FixedModelEntityItem<Entity, ParentEntity, CollectionItem>::slot_edit(Attri
             Base::m_project_builder.get_project(),
             form_factory,
             entity_browser,
+            m_custom_entity_ui,
             values,
             this,
             SLOT(slot_edit_accepted(foundation::Dictionary)),

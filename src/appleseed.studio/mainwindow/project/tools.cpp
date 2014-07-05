@@ -73,7 +73,7 @@ string get_entity_name_dialog(
     return ok ? result.toStdString() : string();
 }
 
-void open_entity_editor(
+EntityEditorWindow* open_entity_editor(
     QWidget*                                        parent,
     const std::string&                              window_title,
     const renderer::Project&                        project,
@@ -110,9 +110,11 @@ void open_entity_editor(
 
     editor_window->showNormal();
     editor_window->activateWindow();
+
+    return editor_window;
 }
 
-void open_entity_editor(
+EntityEditorWindow* open_entity_editor(
     QWidget*                                parent,
     const string&                           window_title,
     const Project&                          project,
@@ -124,7 +126,7 @@ void open_entity_editor(
     const char*                             slot_accept,
     const char*                             slot_cancel)
 {
-    open_entity_editor(
+    return open_entity_editor(
         parent,
         window_title,
         project,
@@ -138,7 +140,7 @@ void open_entity_editor(
         slot_cancel);
 }
 
-void open_entity_editor(
+EntityEditorWindow* open_entity_editor(
     QWidget*                                parent,
     const string&                           window_title,
     const Project&                          project,
@@ -149,7 +151,7 @@ void open_entity_editor(
     const char*                             slot_accept,
     const char*                             slot_cancel)
 {
-    open_entity_editor(
+    return open_entity_editor(
         parent,
         window_title,
         project,

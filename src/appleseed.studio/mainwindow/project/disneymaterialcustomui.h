@@ -46,6 +46,7 @@
 
 // Forward declarations.
 namespace appleseed { namespace studio { class LineEditForwarder; } }
+namespace appleseed { namespace studio { class DisneyMaterialLayerUI; } }
 class QSignalMapper;
 class QVBoxLayout;
 
@@ -83,7 +84,6 @@ class DisneyMaterialCustomUI
   private:
     void create_connections();
     void create_buttons_connections(const QString& widget_name);
-    void create_form_layout();
     void create_parameters_layout();
     void create_layer_layout(const std::string& layer_name);
 
@@ -119,7 +119,7 @@ class DisneyMaterialCustomUI
     foundation::Dictionary          m_renames;
     renderer::ParamArray            m_params;
 
-    class LayerWidget;
+    friend class DisneyMaterialLayerUI;
 };
 
 }       // namespace studio

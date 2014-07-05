@@ -1,0 +1,259 @@
+//
+// This source file is part of appleseed.
+// Visit http://appleseedhq.net/ for additional information and resources.
+//
+// This software is released under the MIT license.
+//
+// Copyright (c) 2014 Marius Avram, The appleseedhq Organization
+//
+// Permission is hereby granted, free of charge, to any person obtaining a copy
+// of this software and associated documentation files (the "Software"), to deal
+// in the Software without restriction, including without limitation the rights
+// to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
+// copies of the Software, and to permit persons to whom the Software is
+// furnished to do so, subject to the following conditions:
+//
+// The above copyright notice and this permission notice shall be included in
+// all copies or substantial portions of the Software.
+//
+// THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
+// IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
+// FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
+// AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
+// LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
+// OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
+// THE SOFTWARE.
+//
+
+// Interface header.
+#include "disneymateriallayerui.h"
+
+// appleseed.studio headers.
+#include "mainwindow/project/disneymaterialcustomui.h"
+
+// Qt headers.
+#include <QVBoxLayout>
+#include <QWidget>
+#include <Qt>
+#include <QToolButton>
+#include <QStyle>
+
+using namespace foundation;
+using namespace std;
+
+namespace appleseed {
+namespace studio {
+
+DisneyMaterialLayerUI::DisneyMaterialLayerUI(
+    const string&               layer_name,
+    DisneyMaterialCustomUI*     entity_editor,
+    QVBoxLayout*                form_layout,
+    QWidget*                    parent)
+  : m_layer_name(layer_name)
+  , m_entity_editor(entity_editor)
+  , QFrame(parent)
+  , m_form_layout(form_layout)
+  , m_is_folded(false)
+{
+    setObjectName("layer");
+
+    m_spacer = new QWidget();
+    QHBoxLayout* spacer_layout = new QHBoxLayout(m_spacer);
+    spacer_layout->setSpacing(0);
+
+    m_layout = new QVBoxLayout(this);
+    m_form_layout->insertWidget(m_form_layout->count() - 2, this);
+
+    QWidget *button_box = new QWidget(this);
+    QHBoxLayout *button_box_layout = new QHBoxLayout(button_box);
+    button_box_layout->setSpacing(0);
+    button_box_layout->setMargin(0);
+    m_layout->addWidget(button_box);
+
+    // Folding button.
+    m_fold_arrow_disabled = QIcon(":/widgets/header_arrow_down_disabled.png");
+    m_fold_arrow_enabled = QIcon(":/widgets/scrollbar_arrow_right_disabled.png");
+    m_fold_button = new QToolButton(button_box);
+    m_fold_button->setIcon(m_fold_arrow_disabled);
+    button_box_layout->addWidget(m_fold_button);
+    connect(m_fold_button, SIGNAL(clicked()), this, SLOT(slot_fold()));
+
+    button_box_layout->addStretch(1);
+
+    // Up button.
+    QIcon arrow_up = QIcon(":icons/layer_arrow_up.png");
+    QToolButton* up_button = new QToolButton(button_box);
+    up_button->setIcon(arrow_up);
+    button_box_layout->addWidget(up_button);
+    connect(up_button, SIGNAL(clicked()), this, SLOT(slot_move_layer_up()));
+
+    // Down button.
+    QIcon arrow_down = QIcon(":icons/layer_arrow_down.png");
+    QToolButton* down_button = new QToolButton(button_box);
+    down_button->setIcon(arrow_down);
+    button_box_layout->addWidget(down_button);
+    connect(down_button, SIGNAL(clicked()), this, SLOT(slot_move_layer_down()));
+
+    // Close button.
+    QIcon close = QIcon(":/icons/close.png");
+    QToolButton* close_button = new QToolButton(button_box);
+    close_button->setIcon(close);
+    button_box_layout->addWidget(close_button);
+    connect(close_button, SIGNAL(clicked()), this, SLOT(slot_delete_layer()));
+}
+
+void DisneyMaterialLayerUI::mousePressEvent(QMouseEvent* event)
+{
+    for (int i=1; i<m_form_layout->count()-2; ++i)
+    {
+        QLayoutItem* layout_item = m_form_layout->itemAt(i);
+        QWidget* widget = layout_item->widget();
+        if (widget->objectName() == "selected_layer")
+        {
+            widget->setObjectName("layer");
+            style()->unpolish(widget);
+            style()->polish(widget);
+            break;
+        }
+    }
+    setObjectName("selected_layer");
+    style()->unpolish(this);
+    style()->polish(this);
+}
+
+void DisneyMaterialLayerUI::mouseDoubleClickEvent(QMouseEvent* event)
+{
+    fold_layer();
+}
+
+QVBoxLayout* DisneyMaterialLayerUI::get_layout()
+{
+    return m_layout;
+}
+
+void DisneyMaterialLayerUI::fold_layer()
+{
+    if (m_is_folded)
+    {
+        m_layout->removeWidget(m_spacer);
+        m_spacer->hide();
+        m_fold_button->setIcon(m_fold_arrow_disabled);
+    }
+
+    for (int i=2; i<m_layout->count(); ++i)
+    {
+        QLayout* vertical_layout = m_layout->itemAt(i)->layout();
+        for (int j=0; j<vertical_layout->count(); ++j)
+        {
+            QWidget* widget = vertical_layout->itemAt(j)->widget();
+            m_is_folded ? widget->show() : widget->hide();
+        }
+    }
+    
+    if (!m_is_folded)
+    {
+        m_layout->addWidget(m_spacer);
+        m_spacer->show();
+        m_fold_button->setIcon(m_fold_arrow_enabled);
+    }
+
+    m_is_folded = !m_is_folded;
+}
+
+void DisneyMaterialLayerUI::slot_delete_layer() 
+{
+    // Remove model
+    string layer_rename = m_entity_editor->m_renames.get(m_layer_name.c_str());
+    m_entity_editor->m_params.dictionaries().remove(layer_rename);
+    delete this;
+}
+
+void DisneyMaterialLayerUI::slot_move_layer_up()
+{
+    int new_position = 0;
+    // Update interface.
+    for (int i=1; i<m_form_layout->count(); ++i)
+    {
+        QLayoutItem* layout_item = m_form_layout->itemAt(i);
+        if (this == layout_item->widget())
+        {
+            if (i > 1)
+            {
+                m_form_layout->takeAt(i);
+                new_position = i-1;
+                m_form_layout->insertWidget(new_position, this);
+            }
+            break;
+        }
+    }
+
+    // Update model.
+    if (new_position > 0)
+    {
+        string previous_layer_name, current_layer_name;
+        for (const_each<DictionaryDictionary> i = m_entity_editor->m_params.dictionaries(); i; ++i)
+        {
+            Dictionary& layer_params = m_entity_editor->m_params.dictionary(i->name());
+            size_t layer_number = layer_params.get<size_t>("layer_number");
+            if (layer_number == new_position)
+                previous_layer_name = i->name();
+            else if (layer_number == new_position+1)
+                current_layer_name = i->name();
+        }
+        m_entity_editor->m_params
+            .dictionary(previous_layer_name)
+            .insert("layer_number", new_position+1);
+        m_entity_editor->m_params
+            .dictionary(current_layer_name)
+            .insert("layer_number", new_position);
+    }
+}
+
+void DisneyMaterialLayerUI::slot_move_layer_down()
+{
+    int new_position = 0;
+    // Update interface.
+    for (int i=1; i<m_form_layout->count(); ++i)
+    {
+        QLayoutItem* layout_item = m_form_layout->itemAt(i);
+        if (this == layout_item->widget())
+        {
+            if (i < m_form_layout->count()-3)
+            {
+                m_form_layout->takeAt(i);
+                new_position = i+1;
+                m_form_layout->insertWidget(new_position, this);
+            }
+            break;
+        }
+    }
+
+    // Update model.
+    if (new_position > 0)
+    {
+        string next_layer_name, current_layer_name;
+        for (const_each<DictionaryDictionary> i = m_entity_editor->m_params.dictionaries(); i; ++i)
+        {
+            Dictionary& layer_params = m_entity_editor->m_params.dictionary(i->name());
+            size_t layer_number = layer_params.get<size_t>("layer_number");
+            if (layer_number == new_position-1)
+                current_layer_name = i->name();
+            else if (layer_number == new_position)
+                next_layer_name = i->name();
+        }
+        m_entity_editor->m_params
+            .dictionary(current_layer_name)
+            .insert("layer_number", new_position);
+        m_entity_editor->m_params
+            .dictionary(next_layer_name)
+            .insert("layer_number", new_position-1);
+    }
+}
+
+void DisneyMaterialLayerUI::slot_fold()
+{
+    fold_layer();
+}
+
+}       // namespace studio
+}       // namespace appleseed
