@@ -100,6 +100,19 @@ void DisneyMaterialCustomUI::create_custom_widgets(
     const Dictionary&   values)
 {
     m_parent = layout->parentWidget();
+
+    // Resize if has EntityEditorWidget ancestor
+    QWidget* parent = m_parent;
+    while (parent != 0)
+    {
+        if (parent->objectName().toStdString() == "EntityEditorWindow")
+        {
+            parent->resize(500, 630);
+            break;
+        }
+        parent = parent->parentWidget();
+    }
+
     m_form_layout = layout;
     m_form_layout->setSpacing(5);
 

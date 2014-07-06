@@ -62,20 +62,17 @@ class FixedModelEntityItem
         Entity*                                         entity,
         ParentEntity&                                   parent,
         CollectionItem*                                 collection_item,
-        ProjectBuilder&                                 project_builder,
-        std::auto_ptr<EntityEditor::ICustomEntityUI>    custom_entity_ui);
+        ProjectBuilder&                                 project_builder);
 
-  private:
+  protected:
     typedef EntityItem<Entity, ParentEntity, CollectionItem> Base;
     typedef typename renderer::EntityTraits<Entity> EntityTraitsType;
 
     typedef FixedModelEntityEditorFormFactory<
         typename EntityTraitsType::FactoryRegistrarType
     > FixedModelEntityEditorFormFactoryType;
-
+  private:
     virtual void slot_edit(AttributeEditor* attribute_editor) OVERRIDE;
-
-    std::auto_ptr<EntityEditor::ICustomEntityUI> m_custom_entity_ui;
 };
 
 
@@ -88,11 +85,9 @@ FixedModelEntityItem<Entity, ParentEntity, CollectionItem>::FixedModelEntityItem
     Entity*                                         entity,
     ParentEntity&                                   parent,
     CollectionItem*                                 collection_item,
-    ProjectBuilder&                                 project_builder,
-    std::auto_ptr<EntityEditor::ICustomEntityUI>    custom_entity_ui)
+    ProjectBuilder&                                 project_builder)
 
   : Base(entity, parent, collection_item, project_builder)
-  , m_custom_entity_ui(custom_entity_ui)
 {
 }
 
@@ -119,6 +114,7 @@ void FixedModelEntityItem<Entity, ParentEntity, CollectionItem>::slot_edit(Attri
         attribute_editor->edit(
             form_factory,
             entity_browser,
+            std::auto_ptr<EntityEditor::ICustomEntityUI>(),
             values,
             this,
             SLOT(slot_edit_accepted(foundation::Dictionary)));
@@ -135,7 +131,6 @@ void FixedModelEntityItem<Entity, ParentEntity, CollectionItem>::slot_edit(Attri
             Base::m_project_builder.get_project(),
             form_factory,
             entity_browser,
-            m_custom_entity_ui,
             values,
             this,
             SLOT(slot_edit_accepted(foundation::Dictionary)),

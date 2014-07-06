@@ -36,6 +36,7 @@
 #include "mainwindow/project/entityeditor.h"
 #include "mainwindow/project/entityeditorwindow.h"
 #include "mainwindow/project/fixedmodelentityitem.h"
+#include "mainwindow/project/materialitem.h"
 
 // Standard headers.
 #include <string.h>
@@ -83,7 +84,7 @@ ItemBase* MaterialCollectionItem::create_item(Material* material)
 {
     assert(material);
 
-    typedef FixedModelEntityItem<renderer::Material, renderer::Assembly, MaterialCollectionItem> MaterialItem;
+    //typedef FixedModelEntityItem<renderer::Material, renderer::Assembly, MaterialCollectionItem> MaterialItem;
     std::auto_ptr<EntityEditor::ICustomEntityUI> custom_entity_ui;
     
     if (strcmp(material->get_model(), "disney_material") == 0)
@@ -92,7 +93,7 @@ ItemBase* MaterialCollectionItem::create_item(Material* material)
             new DisneyMaterialCustomUI(Base::m_project_builder.get_project()));
     }
 
-    ItemBase* item = new MaterialItem(material, m_parent, this, m_project_builder, custom_entity_ui);
+    ItemBase* item = new MaterialItem(material, m_parent, this, m_project_builder);
     m_project_builder.get_item_registry().insert(material->get_uid(), item);
     return item;
 }
@@ -146,7 +147,7 @@ void MaterialCollectionItem::do_create_material(const char* model)
             new DisneyMaterialCustomUI(Base::m_project_builder.get_project()));
     }
 
-    EntityEditorWindow* editor_window = open_entity_editor(
+    open_entity_editor(
         QTreeWidgetItem::treeWidget(),
         window_title,
         Base::m_project_builder.get_project(),
@@ -158,11 +159,6 @@ void MaterialCollectionItem::do_create_material(const char* model)
         SLOT(slot_create_applied(foundation::Dictionary)),
         SLOT(slot_create_accepted(foundation::Dictionary)),
         SLOT(slot_create_canceled(foundation::Dictionary)));
-
-    if (strcmp(model, "disney_material") == 0)
-    {
-        editor_window->resize(500, 630);
-    }
 }
 
 }   // namespace studio

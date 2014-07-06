@@ -85,6 +85,7 @@ void FrameItem::slot_edit(AttributeEditor* attribute_editor)
         attribute_editor->edit(
             form_factory,
             auto_ptr<EntityEditor::IEntityBrowser>(0),
+            auto_ptr<EntityEditor::ICustomEntityUI>(),
             m_frame->get_parameters(),
             this,
             SLOT(slot_edit_accepted(foundation::Dictionary)));

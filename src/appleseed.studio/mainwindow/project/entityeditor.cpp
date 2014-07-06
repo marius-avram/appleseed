@@ -87,7 +87,7 @@ EntityEditor::EntityEditor(
     const Project&                  project,
     auto_ptr<IFormFactory>          form_factory,
     auto_ptr<IEntityBrowser>        entity_browser,
-    std::auto_ptr<ICustomEntityUI>  custom_ui,
+    auto_ptr<ICustomEntityUI>       custom_ui,
     const Dictionary&               values)
   : QObject(parent)
   , m_parent(parent)

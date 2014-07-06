@@ -65,6 +65,7 @@ EntityEditorWindow::EntityEditorWindow(
     setWindowTitle(QString::fromStdString(window_title));
     setWindowFlags(Qt::Tool);
     setAttribute(Qt::WA_DeleteOnClose);
+    setObjectName("EntityEditorWindow");
 
     m_entity_editor.reset(
         new EntityEditor(

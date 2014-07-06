@@ -65,7 +65,7 @@ std::string get_entity_name_dialog(
     const std::string&                          label,
     const std::string&                          text);
 
-EntityEditorWindow* open_entity_editor(
+void open_entity_editor(
     QWidget*                                        parent,
     const std::string&                              window_title,
     const renderer::Project&                        project,
@@ -78,7 +78,7 @@ EntityEditorWindow* open_entity_editor(
     const char*                                     slot_accept,
     const char*                                     slot_cancel);
 
-EntityEditorWindow* open_entity_editor(
+void open_entity_editor(
     QWidget*                                        parent,
     const std::string&                              window_title,
     const renderer::Project&                        project,
@@ -90,7 +90,7 @@ EntityEditorWindow* open_entity_editor(
     const char*                                     slot_accept,
     const char*                                     slot_cancel);
 
-EntityEditorWindow* open_entity_editor(
+void open_entity_editor(
     QWidget*                                        parent,
     const std::string&                              window_title,
     const renderer::Project&                        project,
