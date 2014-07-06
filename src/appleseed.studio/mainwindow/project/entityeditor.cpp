@@ -102,7 +102,7 @@ EntityEditor::EntityEditor(
     assert(m_parent->layout() == 0);
 
     m_top_layout = new QVBoxLayout(m_parent);
-    m_top_layout->setMargin(0);
+    m_top_layout->setMargin(7);
     
     create_form_layout();
     create_connections();
