@@ -138,7 +138,7 @@ void DisneyMaterialCustomUI::create_custom_widgets(
 
 Dictionary DisneyMaterialCustomUI::get_values() const
 {
-    return Dictionary();
+    return m_values;
 }
 
 void DisneyMaterialCustomUI::slot_add_layer()
@@ -242,17 +242,24 @@ void DisneyMaterialCustomUI::slot_line_edit_changed(const QString& widget_name)
     vector<string> widget_tokens;
     tokenize(widget_name.toStdString(), ";", widget_tokens);
     string initial_layer_name = widget_tokens[0];
-    string layer_name = m_renames.get(initial_layer_name.c_str());
     string parameter = widget_tokens[1];
+    // Handle base parameters.
+    if (initial_layer_name == "base")
+    {
+        m_values.insert(parameter, proxy->get());
+        return;
+    }
+    string layer_name = m_renames.get(initial_layer_name.c_str());
+
 
     // Handle layer rename.
     if (parameter == "layer_name")
     {
-        Dictionary old_layer_params = m_params.dictionary(layer_name);
+        Dictionary old_layer_params = m_values.dictionary(layer_name);
         string new_layer_name = proxy->get();
         m_renames.insert(initial_layer_name, new_layer_name);
-        m_params.dictionaries().remove(layer_name.c_str());
-        m_params.insert(new_layer_name, old_layer_params);
+        m_values.dictionaries().remove(layer_name.c_str());
+        m_values.insert(new_layer_name, old_layer_params);
         layer_name = new_layer_name;
 
         // Debug info.
@@ -265,7 +272,7 @@ void DisneyMaterialCustomUI::slot_line_edit_changed(const QString& widget_name)
     }
 
     // Handle generic line edit change.
-    Dictionary& layer_params = m_params.dictionary(layer_name);
+    Dictionary& layer_params = m_values.dictionary(layer_name);
     layer_params.insert(parameter, proxy->get());
 
     // Debug info.
@@ -487,6 +494,8 @@ void DisneyMaterialCustomUI::add_material_parameters()
 
         if (type == "colormap")
             create_colormap_input_widgets(*i, "base");
+
+        m_values.insert(i->get<string>("name"), i->get<string>("default"));
     }
 }
 
@@ -603,7 +612,7 @@ void DisneyMaterialCustomUI::add_layer()
         else if (type == "text")
             create_text_input_widgets(*i, layer_name);
     }
-    m_params.insert(layer_name, layer_params);
+    m_values.insert(layer_name, layer_params);
     m_renames.insert(layer_name, layer_name);
 }
 

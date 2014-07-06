@@ -117,7 +117,7 @@ class DisneyMaterialCustomUI
 
     InputWidgetProxyCollection      m_widget_proxies;
     foundation::Dictionary          m_renames;
-    renderer::ParamArray            m_params;
+    foundation::Dictionary          m_values;
 
     friend class DisneyMaterialLayerUI;
 };

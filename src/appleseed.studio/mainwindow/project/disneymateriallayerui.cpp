@@ -164,7 +164,7 @@ void DisneyMaterialLayerUI::slot_delete_layer()
 {
     // Remove model
     string layer_rename = m_entity_editor->m_renames.get(m_layer_name.c_str());
-    m_entity_editor->m_params.dictionaries().remove(layer_rename);
+    m_entity_editor->m_values.dictionaries().remove(layer_rename);
     delete this;
 }
 
@@ -191,19 +191,19 @@ void DisneyMaterialLayerUI::slot_move_layer_up()
     if (new_position > 0)
     {
         string previous_layer_name, current_layer_name;
-        for (const_each<DictionaryDictionary> i = m_entity_editor->m_params.dictionaries(); i; ++i)
+        for (const_each<DictionaryDictionary> i = m_entity_editor->m_values.dictionaries(); i; ++i)
         {
-            Dictionary& layer_params = m_entity_editor->m_params.dictionary(i->name());
+            Dictionary& layer_params = m_entity_editor->m_values.dictionary(i->name());
             size_t layer_number = layer_params.get<size_t>("layer_number");
             if (layer_number == new_position)
                 previous_layer_name = i->name();
             else if (layer_number == new_position+1)
                 current_layer_name = i->name();
         }
-        m_entity_editor->m_params
+        m_entity_editor->m_values
             .dictionary(previous_layer_name)
             .insert("layer_number", new_position+1);
-        m_entity_editor->m_params
+        m_entity_editor->m_values
             .dictionary(current_layer_name)
             .insert("layer_number", new_position);
     }
@@ -232,19 +232,19 @@ void DisneyMaterialLayerUI::slot_move_layer_down()
     if (new_position > 0)
     {
         string next_layer_name, current_layer_name;
-        for (const_each<DictionaryDictionary> i = m_entity_editor->m_params.dictionaries(); i; ++i)
+        for (const_each<DictionaryDictionary> i = m_entity_editor->m_values.dictionaries(); i; ++i)
         {
-            Dictionary& layer_params = m_entity_editor->m_params.dictionary(i->name());
+            Dictionary& layer_params = m_entity_editor->m_values.dictionary(i->name());
             size_t layer_number = layer_params.get<size_t>("layer_number");
             if (layer_number == new_position-1)
                 current_layer_name = i->name();
             else if (layer_number == new_position)
                 next_layer_name = i->name();
         }
-        m_entity_editor->m_params
+        m_entity_editor->m_values
             .dictionary(current_layer_name)
             .insert("layer_number", new_position);
-        m_entity_editor->m_params
+        m_entity_editor->m_values
             .dictionary(next_layer_name)
             .insert("layer_number", new_position-1);
     }
