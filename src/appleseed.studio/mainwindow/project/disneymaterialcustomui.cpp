@@ -116,6 +116,9 @@ void DisneyMaterialCustomUI::create_custom_widgets(
     m_form_layout = layout;
     m_form_layout->setSpacing(5);
 
+    // Copy values
+    m_values = values;
+
     // Global material parameters.
     add_material_parameters();
 
@@ -129,9 +132,25 @@ void DisneyMaterialCustomUI::create_custom_widgets(
     // Stretch at the end.
     m_form_layout->addStretch(1);
 
-    // Default layer.
-    add_layer();
-    
+    if (m_values.dictionaries().size() != 0)
+    {
+        // Build layers.
+        for (int i = 1; i <= m_values.dictionaries().size(); ++i)
+        {
+            for (const_each<DictionaryDictionary> d = m_values.dictionaries(); d; ++d)
+            {
+                size_t layer_number = d->value().get<size_t>("layer_number");
+                if (layer_number == i)
+                    add_layer(d->value());
+            }
+        }
+    }
+    else
+    {
+        // Default layer.
+        add_layer();
+    }
+
     // Recreate connections.
     create_connections();
 }
@@ -488,22 +507,31 @@ void DisneyMaterialCustomUI::add_material_parameters()
             .insert("default", "0"));
 
     create_parameters_layout();
-    for (const_each<InputMetadataCollection> i = metadata; i; ++i)
+    for (each<InputMetadataCollection> i = metadata; i; ++i)
     {
         const string type = i->get<string>("type");
+        const char* name = i->get<string>("name").c_str();
+        
+        // Change default value to existing value.
+        const string default_value = m_values.strings().exist(name) ?
+            m_values.get(name) : i->get<string>("default");
+        i->insert("default", default_value);
 
         if (type == "colormap")
             create_colormap_input_widgets(*i, "base");
 
-        m_values.insert(i->get<string>("name"), i->get<string>("default"));
+        m_values.insert(name, default_value);
     }
 }
 
-void DisneyMaterialCustomUI::add_layer()
+void DisneyMaterialCustomUI::add_layer(const Dictionary& parameters)
 {
     typedef std::vector<foundation::Dictionary> InputMetadataCollection;
     InputMetadataCollection metadata;
-    const string layer_name = unique_layer_name();
+    string layer_name = unique_layer_name();
+    if (parameters.strings().exist("layer_name"))
+        layer_name = parameters.strings().get<string>("layer_name");
+
     create_layer_layout(layer_name);
 
     metadata.push_back(
@@ -600,10 +628,15 @@ void DisneyMaterialCustomUI::add_layer()
     Dictionary layer_params;
     layer_params.insert("layer_number", m_num_created_layers);
 
-    for (const_each<InputMetadataCollection> i = metadata; i; ++i)
+    for (each<InputMetadataCollection> i = metadata; i; ++i)
     {
-        layer_params.insert(i->get<string>("name"), i->get<string>("default"));
         const string type = i->get<string>("type");
+        const char* name = i->get<string>("name").c_str();
+
+        // Change default value to existing value.
+        const string default_value = parameters.strings().exist(name) ?
+            parameters.get(name) : i->get<string>("default");
+        i->insert("default", default_value);
 
         if (type == "color")
             create_color_input_widgets(*i, layer_name);
@@ -611,6 +644,8 @@ void DisneyMaterialCustomUI::add_layer()
             create_colormap_input_widgets(*i, layer_name);
         else if (type == "text")
             create_text_input_widgets(*i, layer_name);
+
+        layer_params.insert(name, default_value);
     }
     m_values.insert(layer_name, layer_params);
     m_renames.insert(layer_name, layer_name);
