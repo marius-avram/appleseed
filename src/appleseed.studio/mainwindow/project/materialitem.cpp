@@ -65,11 +65,11 @@ void MaterialItem::slot_edit(AttributeEditor* attribute_editor)
     std::auto_ptr<EntityEditor::IEntityBrowser> entity_browser(
         new EntityBrowser<Assembly>(m_parent));
 
-    std::auto_ptr<EntityEditor::ICustomEntityUI> custom_entity_ui;
+    std::auto_ptr<ICustomEntityUI> custom_entity_ui;
 
     if (strcmp(m_entity->get_model(), "disney_material") == 0)
     {
-        custom_entity_ui = std::auto_ptr<EntityEditor::ICustomEntityUI>(
+        custom_entity_ui = std::auto_ptr<ICustomEntityUI>(
             new DisneyMaterialCustomUI(Base::m_project_builder.get_project()));
     }
 

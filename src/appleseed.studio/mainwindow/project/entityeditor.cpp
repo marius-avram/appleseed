@@ -141,6 +141,10 @@ void EntityEditor::create_connections()
     connect(
         m_file_picker_signal_mapper, SIGNAL(mapped(const QString&)),
         SLOT(slot_open_file_picker(const QString&)));
+    
+    if (m_custom_ui.get())
+        connect(m_custom_ui.get(), SIGNAL(signal_custom_applied()),
+            SLOT(slot_apply()));
 }
 
 void EntityEditor::rebuild_form(const Dictionary& values)
@@ -555,9 +559,9 @@ auto_ptr<IInputWidgetProxy> EntityEditor::create_file_input_widgets(const Dictio
 
 void EntityEditor::slot_rebuild_form()
 {
-    rebuild_form(m_widget_proxies.get_values());
+    rebuild_form(get_values());
 
-    emit signal_applied(m_widget_proxies.get_values());
+    emit signal_applied(get_values());
 }
 
 namespace
@@ -728,7 +732,7 @@ void EntityEditor::slot_open_file_picker(const QString& widget_name)
 
 void EntityEditor::slot_apply()
 {
-    emit signal_applied(m_widget_proxies.get_values());
+    emit signal_applied(get_values());
 }
 
 }   // namespace studio

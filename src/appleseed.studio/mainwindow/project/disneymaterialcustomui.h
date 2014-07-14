@@ -54,8 +54,7 @@ namespace appleseed {
 namespace studio {
 
 class DisneyMaterialCustomUI
-  : public QWidget
-  , public EntityEditor::ICustomEntityUI
+  : public ICustomEntityUI
 {
     Q_OBJECT
 

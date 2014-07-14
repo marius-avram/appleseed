@@ -31,6 +31,7 @@
 #define APPLESEED_STUDIO_MAINWINDOW_PROJECT_ENTITYEDITOR_H
 
 // appleseed.studio headers.
+#include "mainwindow/project/icustomentityui.h"
 #include "utility/inputwidgetproxies.h"
 
 // appleseed.foundation headers.
@@ -95,19 +96,6 @@ class EntityEditor
 
         virtual foundation::StringDictionary get_entities(
             const std::string&              type) const = 0;
-    };
-
-    class ICustomEntityUI
-      : public foundation::NonCopyable
-    {
-      public:
-        virtual ~ICustomEntityUI() {}
-        
-        virtual void create_custom_widgets(
-            QVBoxLayout*                    layout,
-            const foundation::Dictionary&   values) = 0;
-        
-        virtual foundation::Dictionary get_values() const = 0;
     };
 
     EntityEditor(

@@ -47,6 +47,7 @@ LineEditDoubleSliderAdaptor::LineEditDoubleSliderAdaptor(
   , m_line_edit(line_edit)
   , m_slider(slider)
 {
+    slot_set_slider_value(m_line_edit->text());
 }
 
 void LineEditDoubleSliderAdaptor::slot_set_line_edit_value(const double value)

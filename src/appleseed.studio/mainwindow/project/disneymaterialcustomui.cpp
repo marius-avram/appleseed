@@ -77,8 +77,7 @@ namespace appleseed {
 namespace studio {
 
 DisneyMaterialCustomUI::DisneyMaterialCustomUI(const renderer::Project& project)
-  : QWidget()
-  , m_project(project)
+  : m_project(project)
   , m_parent(0)
   , m_num_created_layers(0)
   , m_selected_layer_widget(0)
@@ -301,6 +300,8 @@ void DisneyMaterialCustomUI::slot_line_edit_changed(const QString& widget_name)
         std::cout << i->name() << " : " << i->value() << std::endl;
     }
     std::cout << "--------------------------" << std::endl;
+
+    emit signal_custom_applied();
 }
 
 void DisneyMaterialCustomUI::create_connections()
@@ -510,11 +511,11 @@ void DisneyMaterialCustomUI::add_material_parameters()
     for (each<InputMetadataCollection> i = metadata; i; ++i)
     {
         const string type = i->get<string>("type");
-        const char* name = i->get<string>("name").c_str();
+        const string name = i->get<string>("name");
         
         // Change default value to existing value.
         const string default_value = m_values.strings().exist(name) ?
-            m_values.get(name) : i->get<string>("default");
+            m_values.get(name.c_str()) : i->get<string>("default");
         i->insert("default", default_value);
 
         if (type == "colormap")
@@ -546,7 +547,7 @@ void DisneyMaterialCustomUI::add_layer(const Dictionary& parameters)
             .insert("name", "mask")
             .insert("label", "Mask")
             .insert("type", "colormap")
-            .insert("default", "0"));
+            .insert("default", "0.5"));
 
     metadata.push_back(
         Dictionary()
@@ -631,11 +632,11 @@ void DisneyMaterialCustomUI::add_layer(const Dictionary& parameters)
     for (each<InputMetadataCollection> i = metadata; i; ++i)
     {
         const string type = i->get<string>("type");
-        const char* name = i->get<string>("name").c_str();
+        const string name = i->get<string>("name");
 
         // Change default value to existing value.
         const string default_value = parameters.strings().exist(name) ?
-            parameters.get(name) : i->get<string>("default");
+            parameters.get(name.c_str()) : i->get<string>("default");
         i->insert("default", default_value);
 
         if (type == "color")
