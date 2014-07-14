@@ -1140,13 +1140,6 @@ QWidget#selected_layer
     border: 2px solid SELECTED_BACKGROUND_COLOR;
 }
 
-QWidget#layer > QLabel, QWidget#disney > QLabel
-{
-    min-width: 85px;
-    qproperty-alignment: AlignRight;
-    margin-top:3px;
-}
-
 QWidget#seexpr_controls
 {
     border: 2px solid BORDER_COLOR;

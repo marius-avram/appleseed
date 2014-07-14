@@ -62,8 +62,8 @@ class DisneyMaterialLayerUI
 
     void mousePressEvent(QMouseEvent* event);
     void mouseDoubleClickEvent(QMouseEvent* event);
-    QVBoxLayout* get_layout();
-  
+    QFormLayout* get_layout();
+
   private:
     void fold_layer();
 
@@ -78,6 +78,7 @@ class DisneyMaterialLayerUI
     DisneyMaterialCustomUI*     m_entity_editor;
 
     QVBoxLayout*                m_layout;
+    QFormLayout*                m_inner_layout;
     QVBoxLayout*                m_form_layout;
     QWidget*                    m_spacer;
     QToolButton*                m_fold_button;

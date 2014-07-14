@@ -32,6 +32,7 @@
 #include "mainwindow/project/disneymaterialcustomui.h"
 
 // Qt headers.
+#include <QFormLayout>
 #include <QVBoxLayout>
 #include <QWidget>
 #include <Qt>
@@ -69,6 +70,9 @@ DisneyMaterialLayerUI::DisneyMaterialLayerUI(
     button_box_layout->setSpacing(0);
     button_box_layout->setMargin(0);
     m_layout->addWidget(button_box);
+
+    m_inner_layout = new QFormLayout();
+    m_layout->addLayout(m_inner_layout);
 
     // Folding button.
     m_fold_arrow_disabled = QIcon(":/widgets/header_arrow_down_disabled.png");
@@ -126,9 +130,9 @@ void DisneyMaterialLayerUI::mouseDoubleClickEvent(QMouseEvent* event)
     fold_layer();
 }
 
-QVBoxLayout* DisneyMaterialLayerUI::get_layout()
+QFormLayout* DisneyMaterialLayerUI::get_layout()
 {
-    return m_layout;
+    return m_inner_layout;
 }
 
 void DisneyMaterialLayerUI::fold_layer()

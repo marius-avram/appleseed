@@ -342,7 +342,7 @@ void DisneyMaterialCustomUI::create_parameters_layout()
 {
     m_group_widget = new QWidget();
     m_group_widget->setObjectName("disney");
-    m_group_layout = new QVBoxLayout(m_group_widget);
+    m_group_layout = new QFormLayout(m_group_widget);
 
     m_form_layout->addWidget(m_group_widget);
 }
@@ -376,7 +376,6 @@ void DisneyMaterialCustomUI::create_text_input_widgets(
     const string label_name = parameters.get<string>("label") + ":";
     const string parameter_name = parameters.get<string>("name");
     const string value = parameters.get<string>("default");
-    QLabel* label = new QLabel(label_name.c_str(), m_group_widget);
     m_line_edit = new LineEditForwarder(value.c_str(), m_group_widget);
 
     string widget_name = group_name + ";" + parameter_name;
@@ -388,10 +387,9 @@ void DisneyMaterialCustomUI::create_text_input_widgets(
 
     QHBoxLayout* layout = new QHBoxLayout();
     layout->setSpacing(6);
-    layout->addWidget(label);
     layout->addWidget(m_line_edit);
 
-    m_group_layout->addLayout(layout);
+    m_group_layout->addRow(QString::fromStdString(label_name), layout);
 }
 
 void DisneyMaterialCustomUI::create_color_input_widgets(
@@ -402,7 +400,6 @@ void DisneyMaterialCustomUI::create_color_input_widgets(
     const string parameter_name = parameters.get<string>("name");
     const string value = parameters.get<string>("default");
 
-    QLabel* label = new QLabel(label_name.c_str(), m_group_widget);
     m_line_edit = new LineEditForwarder(value.c_str(), m_group_widget);
 
     QString name = QString::fromStdString(group_name + ";" + parameter_name);
@@ -426,13 +423,12 @@ void DisneyMaterialCustomUI::create_color_input_widgets(
 
     QHBoxLayout* layout = new QHBoxLayout();
     layout->setSpacing(6);
-    layout->addWidget(label);
     layout->addWidget(m_line_edit);
     layout->addWidget(picker_button);
     layout->addWidget(m_texture_button);
     layout->addWidget(m_expression_button);
 
-    m_group_layout->addLayout(layout);
+    m_group_layout->addRow(QString::fromStdString(label_name), layout);
 }
 
 void DisneyMaterialCustomUI::create_colormap_input_widgets(
@@ -443,7 +439,6 @@ void DisneyMaterialCustomUI::create_colormap_input_widgets(
     const string parameter_name = parameters.get<string>("name");
     const string value = parameters.get<string>("default");
 
-    QLabel* label = new QLabel(label_name.c_str(), m_group_widget);
     m_line_edit = new LineEditForwarder(value.c_str(), m_group_widget);
 
     const double min_value = 0.0;
@@ -479,13 +474,12 @@ void DisneyMaterialCustomUI::create_colormap_input_widgets(
 
     QHBoxLayout* layout = new QHBoxLayout();
     layout->setSpacing(6);
-    layout->addWidget(label);
     layout->addWidget(m_line_edit);
     layout->addWidget(slider);
     layout->addWidget(m_texture_button);
     layout->addWidget(m_expression_button);
 
-    m_group_layout->addLayout(layout);
+    m_group_layout->addRow(QString::fromStdString(label_name), layout);
 }
 
 void DisneyMaterialCustomUI::add_material_parameters()

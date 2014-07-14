@@ -105,7 +105,7 @@ class DisneyMaterialCustomUI
     LineEditForwarder*              m_line_edit;
     QWidget*                        m_texture_button;
     QWidget*                        m_expression_button;
-    QVBoxLayout*                    m_group_layout;
+    QFormLayout*                    m_group_layout;
     QVBoxLayout*                    m_form_layout;
     size_t                          m_num_created_layers;
 
