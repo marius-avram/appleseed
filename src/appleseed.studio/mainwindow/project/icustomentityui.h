@@ -30,10 +30,10 @@
 #define APPLESEED_STUDIO_MAINWINDOW_PROJECT_ICUSTOMENTITYUI_H
 
 // appleseed.foundation headers.
-#include "foundation/core/concepts/noncopyable.h"
 #include "foundation/utility/containers/dictionary.h"
 
-#include <QWidget>
+// Qt headers.
+#include <QObject>
 
 // Forward declarations.
 class QVBoxLayout;
@@ -42,14 +42,11 @@ namespace appleseed {
 namespace studio {
 
 class ICustomEntityUI
-  : public QWidget
-  , public foundation::NonCopyable
+  : public QObject
 {
     Q_OBJECT
 
   public:
-    virtual ~ICustomEntityUI() {}
-
     virtual void create_custom_widgets(
         QVBoxLayout*                    layout,
         const foundation::Dictionary&   values) = 0;
