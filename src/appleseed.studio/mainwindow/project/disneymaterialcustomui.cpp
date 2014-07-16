@@ -131,23 +131,15 @@ void DisneyMaterialCustomUI::create_custom_widgets(
     // Stretch at the end.
     m_form_layout->addStretch(1);
 
-    if (m_values.dictionaries().size() != 0)
+    // Build layers.
+    for (int i = 1; i <= m_values.dictionaries().size(); ++i)
     {
-        // Build layers.
-        for (int i = 1; i <= m_values.dictionaries().size(); ++i)
+        for (const_each<DictionaryDictionary> d = m_values.dictionaries(); d; ++d)
         {
-            for (const_each<DictionaryDictionary> d = m_values.dictionaries(); d; ++d)
-            {
-                size_t layer_number = d->value().get<size_t>("layer_number");
-                if (layer_number == i)
-                    add_layer(d->value());
-            }
+            size_t layer_number = d->value().get<size_t>("layer_number");
+            if (layer_number == i)
+                add_layer(d->value());
         }
-    }
-    else
-    {
-        // Default layer.
-        add_layer();
     }
 
     // Recreate connections.

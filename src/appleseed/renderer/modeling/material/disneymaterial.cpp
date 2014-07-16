@@ -147,7 +147,7 @@ DictionaryArray DisneyMaterialLayer::get_input_metadata()
             .insert("name", "layer_name")
             .insert("label", "Layer name")
             .insert("type", "text")
-            .insert("default", "disney_material1"));
+            .insert("default", "layer1"));
 
     metadata.push_back(
         Dictionary()
@@ -233,6 +233,27 @@ DictionaryArray DisneyMaterialLayer::get_input_metadata()
             .insert("type", "colormap")
             .insert("default", "0"));
     return metadata;
+}
+
+Dictionary DisneyMaterialLayer::get_default_values()
+{
+    DictionaryArray metadata = get_input_metadata();
+
+    Dictionary layer_params;
+    for (size_t i = 0; i < metadata.size(); ++i)
+    {
+        Dictionary parameter = metadata[i];
+        const string name = parameter.get<string>("name");
+        const string default_value = parameter.get<string>("default");
+
+        layer_params.insert(name, default_value);
+    }
+    layer_params.insert("layer_number", 1);
+
+    Dictionary values;
+    values.insert("layer1", layer_params);
+
+    return values;
 }
 
 //

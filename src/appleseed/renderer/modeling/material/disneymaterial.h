@@ -64,7 +64,9 @@ class DLLSYMBOL DisneyMaterialLayer
     bool check_expressions_syntax() const;
 
     static foundation::DictionaryArray get_input_metadata();
-    
+
+    static foundation::Dictionary get_default_values();
+
   private:
     friend class DisneyMaterial;
 
