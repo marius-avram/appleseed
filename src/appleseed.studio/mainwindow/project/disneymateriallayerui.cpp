@@ -39,6 +39,7 @@
 #include <QToolButton>
 #include <QStyle>
 
+#include <iostream>
 using namespace foundation;
 using namespace std;
 
@@ -48,12 +49,12 @@ namespace studio {
 DisneyMaterialLayerUI::DisneyMaterialLayerUI(
     const string&               layer_name,
     DisneyMaterialCustomUI*     entity_editor,
-    QVBoxLayout*                form_layout,
+    QVBoxLayout*                parent_layout,
     QWidget*                    parent)
   : m_layer_name(layer_name)
   , m_entity_editor(entity_editor)
   , QFrame(parent)
-  , m_form_layout(form_layout)
+  , m_parent_layout(parent_layout)
   , m_is_folded(false)
 {
     setObjectName("layer");
@@ -62,17 +63,18 @@ DisneyMaterialLayerUI::DisneyMaterialLayerUI(
     QHBoxLayout* spacer_layout = new QHBoxLayout(m_spacer);
     spacer_layout->setSpacing(0);
 
-    m_layout = new QVBoxLayout(this);
-    m_form_layout->insertWidget(m_form_layout->count() - 2, this);
+    QVBoxLayout *layout = new QVBoxLayout(this);
+    m_parent_layout->insertWidget(m_parent_layout->count() - 2, this);
 
     QWidget *button_box = new QWidget(this);
     QHBoxLayout *button_box_layout = new QHBoxLayout(button_box);
     button_box_layout->setSpacing(0);
     button_box_layout->setMargin(0);
-    m_layout->addWidget(button_box);
+    layout->addWidget(button_box);
 
     m_inner_layout = new QFormLayout();
-    m_layout->addLayout(m_inner_layout);
+    m_inner_layout->setSpacing(7);
+    layout->addLayout(m_inner_layout);
 
     // Folding button.
     m_fold_arrow_disabled = QIcon(":/widgets/header_arrow_down_disabled.png");
@@ -108,9 +110,9 @@ DisneyMaterialLayerUI::DisneyMaterialLayerUI(
 
 void DisneyMaterialLayerUI::mousePressEvent(QMouseEvent* event)
 {
-    for (int i=1; i<m_form_layout->count()-2; ++i)
+    for (int i=1; i<m_parent_layout->count()-2; ++i)
     {
-        QLayoutItem* layout_item = m_form_layout->itemAt(i);
+        QLayoutItem* layout_item = m_parent_layout->itemAt(i);
         QWidget* widget = layout_item->widget();
         if (widget->objectName() == "selected_layer")
         {
@@ -139,24 +141,33 @@ void DisneyMaterialLayerUI::fold_layer()
 {
     if (m_is_folded)
     {
-        m_layout->removeWidget(m_spacer);
+        m_inner_layout->setSpacing(7);
+        m_inner_layout->removeWidget(m_spacer);
         m_spacer->hide();
         m_fold_button->setIcon(m_fold_arrow_disabled);
     }
 
-    for (int i=2; i<m_layout->count(); ++i)
+    for (int i=2; i<m_inner_layout->count(); ++i)
     {
-        QLayout* vertical_layout = m_layout->itemAt(i)->layout();
-        for (int j=0; j<vertical_layout->count(); ++j)
-        {
-            QWidget* widget = vertical_layout->itemAt(j)->widget();
+        QWidget* widget = m_inner_layout->itemAt(i)->widget();
+        if (widget)
             m_is_folded ? widget->show() : widget->hide();
+        
+        QLayout* vertical_layout = m_inner_layout->itemAt(i)->layout();
+        if (vertical_layout)
+        {
+            for (int j=0; j<vertical_layout->count(); ++j)
+            {
+                QWidget* widget = vertical_layout->itemAt(j)->widget();
+                m_is_folded ? widget->show() : widget->hide();
+            }
         }
     }
     
     if (!m_is_folded)
     {
-        m_layout->addWidget(m_spacer);
+        m_inner_layout->setSpacing(0);
+        m_inner_layout->addWidget(m_spacer);
         m_spacer->show();
         m_fold_button->setIcon(m_fold_arrow_enabled);
     }
@@ -176,16 +187,16 @@ void DisneyMaterialLayerUI::slot_move_layer_up()
 {
     int new_position = 0;
     // Update interface.
-    for (int i=1; i<m_form_layout->count(); ++i)
+    for (int i=1; i<m_parent_layout->count(); ++i)
     {
-        QLayoutItem* layout_item = m_form_layout->itemAt(i);
+        QLayoutItem* layout_item = m_parent_layout->itemAt(i);
         if (this == layout_item->widget())
         {
             if (i > 1)
             {
-                m_form_layout->takeAt(i);
+                m_parent_layout->takeAt(i);
                 new_position = i-1;
-                m_form_layout->insertWidget(new_position, this);
+                m_parent_layout->insertWidget(new_position, this);
             }
             break;
         }
@@ -217,16 +228,16 @@ void DisneyMaterialLayerUI::slot_move_layer_down()
 {
     int new_position = 0;
     // Update interface.
-    for (int i=1; i<m_form_layout->count(); ++i)
+    for (int i=1; i<m_parent_layout->count(); ++i)
     {
-        QLayoutItem* layout_item = m_form_layout->itemAt(i);
+        QLayoutItem* layout_item = m_parent_layout->itemAt(i);
         if (this == layout_item->widget())
         {
-            if (i < m_form_layout->count()-3)
+            if (i < m_parent_layout->count()-3)
             {
-                m_form_layout->takeAt(i);
+                m_parent_layout->takeAt(i);
                 new_position = i+1;
-                m_form_layout->insertWidget(new_position, this);
+                m_parent_layout->insertWidget(new_position, this);
             }
             break;
         }

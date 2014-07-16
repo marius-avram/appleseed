@@ -55,9 +55,9 @@ class DisneyMaterialLayerUI
 
   public:
     DisneyMaterialLayerUI(
-        const std::string&           layer_name,
+        const std::string&          layer_name,
         DisneyMaterialCustomUI*     entity_editor,
-        QVBoxLayout*                form_layout,
+        QVBoxLayout*                parent_layout,
         QWidget*                    parent = 0);
 
     void mousePressEvent(QMouseEvent* event);
@@ -77,9 +77,8 @@ class DisneyMaterialLayerUI
     std::string                 m_layer_name;
     DisneyMaterialCustomUI*     m_entity_editor;
 
-    QVBoxLayout*                m_layout;
     QFormLayout*                m_inner_layout;
-    QVBoxLayout*                m_form_layout;
+    QVBoxLayout*                m_parent_layout;
     QWidget*                    m_spacer;
     QToolButton*                m_fold_button;
     bool                        m_is_folded;
