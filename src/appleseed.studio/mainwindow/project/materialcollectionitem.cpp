@@ -86,12 +86,13 @@ ItemBase* MaterialCollectionItem::create_item(Material* material)
 
     //typedef FixedModelEntityItem<renderer::Material, renderer::Assembly, MaterialCollectionItem> MaterialItem;
     std::auto_ptr<ICustomEntityUI> custom_entity_ui;
-    
+   /* 
     if (strcmp(material->get_model(), "disney_material") == 0)
-    {
+                        {
         custom_entity_ui = std::auto_ptr<ICustomEntityUI>(
             new DisneyMaterialCustomUI(Base::m_project_builder.get_project()));
     }
+    */
 
     ItemBase* item = new MaterialItem(material, m_parent, this, m_project_builder);
     m_project_builder.get_item_registry().insert(material->get_uid(), item);
@@ -144,7 +145,9 @@ void MaterialCollectionItem::do_create_material(const char* model)
     if (strcmp(model, "disney_material") == 0)
     {
         custom_entity_ui = std::auto_ptr<ICustomEntityUI>(
-            new DisneyMaterialCustomUI(Base::m_project_builder.get_project()));
+            new DisneyMaterialCustomUI(
+                Base::m_project_builder.get_project(),
+                DisneyMaterialLayer::get_input_metadata()));
     }
 
     open_entity_editor(

@@ -29,6 +29,9 @@
 #ifndef APPLESEED_STUDIO_MAINWINDOW_PROJECT_DISNEYMATERIALCUSTOMUI_H
 #define APPLESEED_STUDIO_MAINWINDOW_PROJECT_DISNEYMATERIALCUSTOMUI_H
 
+// appleseed.foundation headers.
+#include "foundation/utility/containers/specializedarrays.h"
+
 // appleseed.renderer headers.
 #include "renderer/utility/paramarray.h"
 
@@ -59,7 +62,9 @@ class DisneyMaterialCustomUI
     Q_OBJECT
 
   public:
-    DisneyMaterialCustomUI(const renderer::Project& project);
+    DisneyMaterialCustomUI(
+        const renderer::Project&            project,
+        foundation::DictionaryArray         layer_metadata);
 
     virtual ~DisneyMaterialCustomUI();
 
@@ -93,7 +98,6 @@ class DisneyMaterialCustomUI
     void create_color_input_widgets(const foundation::Dictionary& parameters, const std::string& group_name);
     void create_colormap_input_widgets(const foundation::Dictionary& parameters, const std::string& group_name);
 
-    void add_material_parameters();
     void add_layer(const foundation::Dictionary& parameters = foundation::Dictionary());
 
     std::vector<QWidget*> m_layers_widgets;
@@ -117,6 +121,8 @@ class DisneyMaterialCustomUI
     InputWidgetProxyCollection      m_widget_proxies;
     foundation::Dictionary          m_renames;
     foundation::Dictionary          m_values;
+
+    foundation::DictionaryArray     m_layer_metadata;
 
     friend class DisneyMaterialLayerUI;
 };

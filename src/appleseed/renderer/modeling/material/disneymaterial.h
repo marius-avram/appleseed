@@ -62,6 +62,8 @@ class DLLSYMBOL DisneyMaterialLayer
     bool operator<(const DisneyMaterialLayer& other) const;
 
     bool check_expressions_syntax() const;
+
+    static foundation::DictionaryArray get_input_metadata();
     
   private:
     friend class DisneyMaterial;
@@ -110,7 +112,7 @@ class DLLSYMBOL DisneyMaterial
 
     std::size_t num_layers() const;
     const DisneyMaterialLayer& get_layer(std::size_t index) const;
-    
+
     struct Impl;
     Impl *impl;
 };

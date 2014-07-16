@@ -70,7 +70,9 @@ void MaterialItem::slot_edit(AttributeEditor* attribute_editor)
     if (strcmp(m_entity->get_model(), "disney_material") == 0)
     {
         custom_entity_ui = std::auto_ptr<ICustomEntityUI>(
-            new DisneyMaterialCustomUI(Base::m_project_builder.get_project()));
+            new DisneyMaterialCustomUI(
+                Base::m_project_builder.get_project(),
+                DisneyMaterialLayer::get_input_metadata()));
     }
 
     foundation::Dictionary values =

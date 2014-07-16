@@ -76,8 +76,11 @@ using namespace std;
 namespace appleseed {
 namespace studio {
 
-DisneyMaterialCustomUI::DisneyMaterialCustomUI(const renderer::Project& project)
+DisneyMaterialCustomUI::DisneyMaterialCustomUI(
+    const Project&          project,
+    DictionaryArray         layer_metadata)
   : m_project(project)
+  , m_layer_metadata(layer_metadata)
   , m_parent(0)
   , m_num_created_layers(0)
   , m_selected_layer_widget(0)
@@ -117,9 +120,6 @@ void DisneyMaterialCustomUI::create_custom_widgets(
 
     // Copy values
     m_values = values;
-
-    // Global material parameters.
-    add_material_parameters();
 
     // New layer button.
     QIcon add_icon = QIcon(":/widgets/big_add.png");
@@ -482,163 +482,40 @@ void DisneyMaterialCustomUI::create_colormap_input_widgets(
     m_group_layout->addRow(QString::fromStdString(label_name), layout);
 }
 
-void DisneyMaterialCustomUI::add_material_parameters()
-{
-    typedef std::vector<foundation::Dictionary> InputMetadataCollection;
-    InputMetadataCollection metadata;
-
-    metadata.push_back(
-        Dictionary()
-            .insert("name", "alpha_mask")
-            .insert("label", "Alpha Mask")
-            .insert("type", "colormap")
-            .insert("default", "0"));
-
-    metadata.push_back(
-        Dictionary()
-            .insert("name", "emission")
-            .insert("label", "Emission")
-            .insert("type", "colormap")
-            .insert("default", "0"));
-
-    create_parameters_layout();
-    for (each<InputMetadataCollection> i = metadata; i; ++i)
-    {
-        const string type = i->get<string>("type");
-        const string name = i->get<string>("name");
-        
-        // Change default value to existing value.
-        const string default_value = m_values.strings().exist(name) ?
-            m_values.get(name.c_str()) : i->get<string>("default");
-        i->insert("default", default_value);
-
-        if (type == "colormap")
-            create_colormap_input_widgets(*i, "base");
-
-        m_values.insert(name, default_value);
-    }
-}
-
 void DisneyMaterialCustomUI::add_layer(const Dictionary& parameters)
 {
-    typedef std::vector<foundation::Dictionary> InputMetadataCollection;
-    InputMetadataCollection metadata;
     string layer_name = unique_layer_name();
+    
     if (parameters.strings().exist("layer_name"))
         layer_name = parameters.strings().get<string>("layer_name");
 
     create_layer_layout(layer_name);
 
-    metadata.push_back(
-        Dictionary()
-            .insert("name", "layer_name")
-            .insert("label", "Layer name")
-            .insert("type", "text")
-            .insert("default", layer_name));
-
-    metadata.push_back(
-        Dictionary()
-            .insert("name", "mask")
-            .insert("label", "Mask")
-            .insert("type", "colormap")
-            .insert("default", "0.5"));
-
-    metadata.push_back(
-        Dictionary()
-            .insert("name", "base_color")
-            .insert("label", "Base Color")
-            .insert("type", "color")
-            .insert("default", "[0.0, 0.0, 0.0]"));
-
-    metadata.push_back(
-        Dictionary()
-            .insert("name", "subsurface")
-            .insert("label", "Subsurface")
-            .insert("type", "colormap")
-            .insert("default", "0"));
-
-    metadata.push_back(
-        Dictionary()
-            .insert("name", "metallic")
-            .insert("label", "Metallic")
-            .insert("type", "colormap")
-            .insert("default", "0"));
-
-    metadata.push_back(
-        Dictionary()
-            .insert("name", "specular")
-            .insert("label", "Specular")
-            .insert("type", "colormap")
-            .insert("default", "0"));
-
-    metadata.push_back(
-        Dictionary()
-            .insert("name", "specular_tint")
-            .insert("label", "Specular tint")
-            .insert("type", "colormap")
-            .insert("default", "0"));
-
-    metadata.push_back(
-        Dictionary()
-            .insert("name", "anisotropic")
-            .insert("label", "Anisotropic")
-            .insert("type", "colormap")
-            .insert("default", "0"));
-
-    metadata.push_back(
-        Dictionary()
-            .insert("name", "roughness")
-            .insert("label", "Roughness")
-            .insert("type", "colormap")
-            .insert("default", "0"));
-
-    metadata.push_back(
-        Dictionary()
-            .insert("name", "sheen")
-            .insert("label", "Sheen")
-            .insert("type", "colormap")
-            .insert("default", "0"));
-
-    metadata.push_back(
-        Dictionary()
-            .insert("name", "shin_tint")
-            .insert("label", "Shin tint")
-            .insert("type", "colormap")
-            .insert("default", "0"));
-
-    metadata.push_back(
-        Dictionary()
-            .insert("name", "clearcoat")
-            .insert("label", "Clearcoat")
-            .insert("type", "colormap")
-            .insert("default", "0"));
-
-    metadata.push_back(
-        Dictionary()
-            .insert("name", "clearcoat_gloss")
-            .insert("label", "Clearcoat gloss")
-            .insert("type", "colormap")
-            .insert("default", "0"));
-
     Dictionary layer_params;
     layer_params.insert("layer_number", m_num_created_layers);
 
-    for (each<InputMetadataCollection> i = metadata; i; ++i)
+    for (size_t i = 0; i < m_layer_metadata.size(); ++i)
     {
-        const string type = i->get<string>("type");
-        const string name = i->get<string>("name");
+        Dictionary metadata = m_layer_metadata[i];
+        const string type = metadata.get<string>("type");
+        const string name = metadata.get<string>("name");
 
         // Change default value to existing value.
-        const string default_value = parameters.strings().exist(name) ?
-            parameters.get(name.c_str()) : i->get<string>("default");
-        i->insert("default", default_value);
+        string default_value = parameters.strings().exist(name) ?
+            parameters.get(name.c_str()) : metadata.get<string>("default");
+        
+        // Change default name in metadata
+        if (name == "layer_name")
+            default_value = layer_name;
+       
+        metadata.insert("default", default_value);
 
         if (type == "color")
-            create_color_input_widgets(*i, layer_name);
+            create_color_input_widgets(metadata, layer_name);
         else if (type == "colormap")
-            create_colormap_input_widgets(*i, layer_name);
+            create_colormap_input_widgets(metadata, layer_name);
         else if (type == "text")
-            create_text_input_widgets(*i, layer_name);
+            create_text_input_widgets(metadata, layer_name);
 
         layer_params.insert(name, default_value);
     }

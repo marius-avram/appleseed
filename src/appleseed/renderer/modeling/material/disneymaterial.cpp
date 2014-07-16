@@ -139,6 +139,102 @@ bool DisneyMaterialLayer::check_expressions_syntax() const
             impl->m_clearcoat_gloss.syntax_ok();            
 }
 
+DictionaryArray DisneyMaterialLayer::get_input_metadata()
+{
+    DictionaryArray metadata;
+    metadata.push_back(
+        Dictionary()
+            .insert("name", "layer_name")
+            .insert("label", "Layer name")
+            .insert("type", "text")
+            .insert("default", "disney_material1"));
+
+    metadata.push_back(
+        Dictionary()
+            .insert("name", "mask")
+            .insert("label", "Mask")
+            .insert("type", "colormap")
+            .insert("default", "0"));
+
+    metadata.push_back(
+        Dictionary()
+            .insert("name", "base_color")
+            .insert("label", "Base Color")
+            .insert("type", "color")
+            .insert("default", "[0.0, 0.0, 0.0]"));
+
+   metadata.push_back(
+        Dictionary()
+            .insert("name", "subsurface")
+            .insert("label", "Subsurface")
+            .insert("type", "colormap")
+            .insert("default", "0"));
+
+    metadata.push_back(
+        Dictionary()
+            .insert("name", "metallic")
+            .insert("label", "Metallic")
+            .insert("type", "colormap")
+            .insert("default", "0"));
+
+    metadata.push_back(
+        Dictionary()
+            .insert("name", "specular")
+            .insert("label", "Specular")
+            .insert("type", "colormap")
+            .insert("default", "0"));
+
+    metadata.push_back(
+        Dictionary()
+            .insert("name", "specular_tint")
+            .insert("label", "Specular tint")
+            .insert("type", "colormap")
+            .insert("default", "0"));
+
+    metadata.push_back(
+        Dictionary()
+            .insert("name", "anisotropic")
+            .insert("label", "Anisotropic")
+            .insert("type", "colormap")
+            .insert("default", "0"));
+
+    metadata.push_back(
+        Dictionary()
+            .insert("name", "roughness")
+            .insert("label", "Roughness")
+            .insert("type", "colormap")
+            .insert("default", "0"));
+
+    metadata.push_back(
+        Dictionary()
+            .insert("name", "sheen")
+            .insert("label", "Sheen")
+            .insert("type", "colormap")
+            .insert("default", "0"));
+
+    metadata.push_back(
+        Dictionary()
+            .insert("name", "shin_tint")
+            .insert("label", "Shin tint")
+            .insert("type", "colormap")
+            .insert("default", "0"));
+
+    metadata.push_back(
+        Dictionary()
+            .insert("name", "clearcoat")
+            .insert("label", "Clearcoat")
+            .insert("type", "colormap")
+            .insert("default", "0"));
+
+    metadata.push_back(
+        Dictionary()
+            .insert("name", "clearcoat_gloss")
+            .insert("label", "Clearcoat gloss")
+            .insert("type", "colormap")
+            .insert("default", "0"));
+    return metadata;
+}
+
 //
 // DisneyMaterial class implementation.
 //
@@ -255,6 +351,21 @@ const char* DisneyMaterialFactory::get_human_readable_model() const
 DictionaryArray DisneyMaterialFactory::get_input_metadata() const
 {
     DictionaryArray metadata;
+
+    metadata.push_back(
+        Dictionary()
+            .insert("name", "alpha_mask")
+            .insert("label", "Alpha Mask")
+            .insert("type", "colormap")
+            .insert("default", "0"));
+
+    metadata.push_back(
+        Dictionary()
+            .insert("name", "emission")
+            .insert("label", "Emission")
+            .insert("type", "colormap")
+            .insert("default", "0"));
+
     return metadata;
 }
 
