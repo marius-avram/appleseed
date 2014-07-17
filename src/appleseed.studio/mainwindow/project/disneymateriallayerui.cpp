@@ -179,7 +179,20 @@ void DisneyMaterialLayerUI::slot_delete_layer()
 {
     // Remove model
     string layer_rename = m_entity_editor->m_renames.get(m_layer_name.c_str());
+    Dictionary& deleted_layer = m_entity_editor->m_values.dictionary(layer_rename);
+    size_t deleted_layer_number = deleted_layer.get<size_t>("layer_number");
     m_entity_editor->m_values.dictionaries().remove(layer_rename);
+
+    // Shift remaining layer numbers.
+    for (const_each<DictionaryDictionary> i = m_entity_editor->m_values.dictionaries(); i; ++i)
+    {
+        Dictionary& layer_params = m_entity_editor->m_values.dictionary(i->name());
+        size_t layer_number = layer_params.get<size_t>("layer_number");
+        if (layer_number > deleted_layer_number)
+            layer_params.insert("layer_number", layer_number - 1);
+    }
+
+    m_entity_editor->emit_signal_custom_applied();
     delete this;
 }
 
@@ -221,6 +234,7 @@ void DisneyMaterialLayerUI::slot_move_layer_up()
         m_entity_editor->m_values
             .dictionary(current_layer_name)
             .insert("layer_number", new_position);
+        m_entity_editor->emit_signal_custom_applied();
     }
 }
 
@@ -262,6 +276,7 @@ void DisneyMaterialLayerUI::slot_move_layer_down()
         m_entity_editor->m_values
             .dictionary(next_layer_name)
             .insert("layer_number", new_position-1);
+        m_entity_editor->emit_signal_custom_applied();
     }
 }
 

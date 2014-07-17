@@ -4,7 +4,6 @@
 //
 // This software is released under the MIT license.
 //
-// Copyright (c) 2014 Esteban Tovagliari, The appleseedhq Organization
 // Copyright (c) 2014 Marius Avram, The appleseedhq Organization
 //
 // Permission is hereby granted, free of charge, to any person obtaining a copy
@@ -26,41 +25,17 @@
 // THE SOFTWARE.
 //
 
-#ifndef APPLESEED_STUDIO_MAINWINDOW_PROJECT_ICUSTOMENTITYUI_H
-#define APPLESEED_STUDIO_MAINWINDOW_PROJECT_ICUSTOMENTITYUI_H
-
-// appleseed.foundation headers.
-#include "foundation/utility/containers/dictionary.h"
-
-// Qt headers.
-#include <QObject>
-
-// Forward declarations.
-class QVBoxLayout;
+// Interface header.
+#include "icustomentityui.h"
 
 namespace appleseed {
 namespace studio {
 
-class ICustomEntityUI
-  : public QObject
+// ICustomEntityUI implementation.
+void ICustomEntityUI::emit_signal_custom_applied()
 {
-    Q_OBJECT
-
-  public:
-    virtual void create_custom_widgets(
-        QVBoxLayout*                    layout,
-        const foundation::Dictionary&   values) = 0;
-
-    virtual foundation::Dictionary get_values() const = 0;
-
-  protected:
-    void emit_signal_custom_applied();
-
-  signals:
-    void signal_custom_applied();
-};
+    emit signal_custom_applied();
+}
 
 }       // namespace studio
 }       // namespace appleseed
-
-#endif  // !APPLESEED_STUDIO_MAINWINDOW_PROJECT_ICUSTOMENTITYUI_H

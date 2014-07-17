@@ -132,13 +132,13 @@ void DisneyMaterialCustomUI::create_custom_widgets(
     m_form_layout->addStretch(1);
 
     // Build layers.
-    for (int i = 1; i <= m_values.dictionaries().size(); ++i)
+    for (size_t i = 1; i <= m_values.dictionaries().size(); ++i)
     {
         for (const_each<DictionaryDictionary> d = m_values.dictionaries(); d; ++d)
         {
             size_t layer_number = d->value().get<size_t>("layer_number");
             if (layer_number == i)
-                add_layer(d->value());
+                add_layer(false, d->value());
         }
     }
 
@@ -153,7 +153,7 @@ Dictionary DisneyMaterialCustomUI::get_values() const
 
 void DisneyMaterialCustomUI::slot_add_layer()
 {
-    add_layer();
+    add_layer(true);
 }
 
 void DisneyMaterialCustomUI::slot_open_color_picker(const QString& widget_name)
@@ -293,7 +293,7 @@ void DisneyMaterialCustomUI::slot_line_edit_changed(const QString& widget_name)
     }
     std::cout << "--------------------------" << std::endl;
 
-    emit signal_custom_applied();
+    emit_signal_custom_applied();
 }
 
 void DisneyMaterialCustomUI::create_connections()
@@ -474,17 +474,22 @@ void DisneyMaterialCustomUI::create_colormap_input_widgets(
     m_group_layout->addRow(QString::fromStdString(label_name), layout);
 }
 
-void DisneyMaterialCustomUI::add_layer(const Dictionary& parameters)
+void DisneyMaterialCustomUI::add_layer(bool update, const Dictionary& parameters)
 {
     string layer_name = unique_layer_name();
     
     if (parameters.strings().exist("layer_name"))
         layer_name = parameters.strings().get<string>("layer_name");
 
+    // Change layer name until is certainly unique.
+    while (update && m_values.dictionaries().exist(layer_name))
+        layer_name = unique_layer_name();
+
     create_layer_layout(layer_name);
 
     Dictionary layer_params;
-    layer_params.insert("layer_number", m_num_created_layers);
+    if (update)
+        layer_params.insert("layer_number", m_values.dictionaries().size()+1);
 
     for (size_t i = 0; i < m_layer_metadata.size(); ++i)
     {
@@ -495,11 +500,11 @@ void DisneyMaterialCustomUI::add_layer(const Dictionary& parameters)
         // Change default value to existing value.
         string default_value = parameters.strings().exist(name) ?
             parameters.get(name.c_str()) : metadata.get<string>("default");
-        
+
         // Change default name in metadata
         if (name == "layer_name")
             default_value = layer_name;
-       
+
         metadata.insert("default", default_value);
 
         if (type == "color")
@@ -509,10 +514,15 @@ void DisneyMaterialCustomUI::add_layer(const Dictionary& parameters)
         else if (type == "text")
             create_text_input_widgets(metadata, layer_name);
 
-        layer_params.insert(name, default_value);
+        if (update)
+            layer_params.insert(name, default_value);
     }
-    m_values.insert(layer_name, layer_params);
+
+    if (update)
+        m_values.insert(layer_name, layer_params);
     m_renames.insert(layer_name, layer_name);
+
+    emit_signal_custom_applied();
 }
 
 }       // namespace studio

@@ -98,7 +98,7 @@ class DisneyMaterialCustomUI
     void create_color_input_widgets(const foundation::Dictionary& parameters, const std::string& group_name);
     void create_colormap_input_widgets(const foundation::Dictionary& parameters, const std::string& group_name);
 
-    void add_layer(const foundation::Dictionary& parameters = foundation::Dictionary());
+    void add_layer(bool update, const foundation::Dictionary& parameters = foundation::Dictionary());
 
     std::vector<QWidget*> m_layers_widgets;
 
