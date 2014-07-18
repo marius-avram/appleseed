@@ -111,10 +111,11 @@ EntityEditor::EntityEditor(
 
 Dictionary EntityEditor::get_values() const
 {
-    Dictionary values(m_widget_proxies.get_values());
-
+    Dictionary values;
     if (m_custom_ui.get())
-        values.merge(m_custom_ui->get_values());
+        values = m_custom_ui->get_values();
+
+    values.merge(m_widget_proxies.get_values());
 
     return values;
 }

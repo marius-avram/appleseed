@@ -253,14 +253,7 @@ void DisneyMaterialCustomUI::slot_line_edit_changed(const QString& widget_name)
     tokenize(widget_name.toStdString(), ";", widget_tokens);
     string initial_layer_name = widget_tokens[0];
     string parameter = widget_tokens[1];
-    // Handle base parameters.
-    if (initial_layer_name == "base")
-    {
-        m_values.insert(parameter, proxy->get());
-        return;
-    }
     string layer_name = m_renames.get(initial_layer_name.c_str());
-
 
     // Handle layer rename.
     if (parameter == "layer_name")
