@@ -144,7 +144,8 @@ inline void XMLElement::write(const bool has_content)
 
     for (const_each<AttributeVector> i = m_attributes; i; ++i)
     {
-        const std::string attribute_value = replace_special_xml_characters(i->second);
+        std::string attribute_value = replace_special_xml_characters(i->second);
+        attribute_value = replace(attribute_value, "\n", "\\n");
         std::fprintf(m_file, " %s=\"%s\"", i->first.c_str(), attribute_value.c_str());
     }
 

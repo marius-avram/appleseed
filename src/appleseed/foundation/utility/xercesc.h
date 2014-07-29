@@ -36,6 +36,7 @@
 #include "foundation/platform/types.h"
 #include "foundation/utility/foreach.h"
 #include "foundation/utility/log.h"
+#include "foundation/utility/string.h"
 
 // Xerces-C++ headers.
 #include "xercesc/framework/MemoryManager.hpp"
@@ -391,7 +392,9 @@ inline std::string ElementHandlerBase<ElementID>::get_value(
     const std::string&          default_value)
 {
     const XMLCh* value = attrs.getValue(transcode(name).c_str());
-    return value ? transcode(value) : default_value;
+    std::string result = value ? transcode(value) : default_value;
+    result = foundation::replace(result, "\\n", "\n");
+    return result;
 }
 
 
