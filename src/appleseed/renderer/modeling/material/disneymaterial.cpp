@@ -41,6 +41,8 @@
 
 // SeExpr headers
 #include "SeExpression.h"
+#include "SeExprFunc.h"
+#include "SeExprNode.h"
 
 // Boost headers.
 #include "boost/algorithm/string.hpp"
@@ -64,6 +66,33 @@ namespace renderer
 
 namespace
 {
+    class TextureSeExprFunc
+      : public SeExprFuncX
+    {
+      public:
+        TextureSeExprFunc()
+          : SeExprFuncX(true)
+        {
+            std::cout << "Texture Expr constructor" << std::endl;
+        }
+
+        ~TextureSeExprFunc()
+        {
+        }
+
+        virtual bool prep(SeExprFuncNode* node, bool wantVec) OVERRIDE
+        {
+            std::cout << "Texture Expr prep" << std::endl;
+            return true;
+        }
+
+        virtual void eval(const SeExprFuncNode* node, SeVec3d& result) const OVERRIDE
+        {
+            std::cout << "Texture Expr eval" << std::endl;
+            result = SeVec3d(0, 0, 0);
+        }
+    };
+
     class SeAppleseedExpr
       : public SeExpression
     {
@@ -89,11 +118,13 @@ namespace
         SeAppleseedExpr()
           : SeExpression()
         {
+            std::cout << "empty constructor" << std::endl;
         }
 
         SeAppleseedExpr(const string& expr)
           : SeExpression(expr)
         {
+            std::cout << "the other construstor" << std::endl;
             m_vars["u"] = Var(0.0);
             m_vars["v"] = Var(0.0);
         }
@@ -107,12 +138,26 @@ namespace
 
         SeExprVarRef* resolveVar(const string& name) const OVERRIDE
         {
+            std::cout << "resolveVar" << name << std::endl;
             const map<string, Var>::iterator i = m_vars.find(name);
 
             if (i != m_vars.end())
                 return &i->second;
 
             return 0;
+        }
+
+        SeExprFunc* resolveFunc(const string& name) const OVERRIDE
+        {
+            if (name == "texture")
+            {
+                std::cout << "texture" << std::endl;
+                TextureSeExprFunc texture_expression;
+                auto_ptr<SeExprFunc> texture_func(new SeExprFunc(texture_expression, 3, 3));
+                return texture_func.get();
+            }
+            std::cout << "my resolveFunc" << std::endl;
+            return SeExpression::resolveFunc(name);
         }
 
         mutable map<string, Var> m_vars;
